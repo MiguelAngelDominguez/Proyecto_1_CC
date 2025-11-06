@@ -114,6 +114,11 @@ def rh_contratar_personal_temporal(estado):
     - Si no hay dinero, debes pedir un préstamo al 12% de interes
         • Es decir, cuentas con los 4 empleados extra por este turno, y te haces una deuda de S/ 11,200
     """
+    if estado['Caja disponible'] < 10000:
+        estado['Deuda pendiente'] = estado['Deuda pendiente'] + 11200
+    else:
+        estado['Caja disponible'] = estado['Caja disponible'] - 10000
+    estado['Empleados Temporales'] = 4
     return estado
 
 def rh_implementar_incentivos(estado):
