@@ -255,6 +255,19 @@ def marketing_co_branding(estado):
     - Si no hay dinero, debes pedir un préstamo al 12% de interes
         • Es decir, realizas la alianza, y te haces una deuda de S/ 3,360
     """
+    # Gasto en caja
+    estado["Caja disponible"] -= 3000
+
+    # Demanda extra este mes y el siguiente
+    estado["DemandaExtraTemporal"] += 300000
+    estado["DemandaExtraProximoMes"] = 100000
+    # Aumenta las ventas en 20%
+    if "TurnosVentasExtra" in estado:
+        estado["TurnosVentasExtra"] += 2
+    else:
+        estado["TurnosVentasExtra"] = 2
+
+    return estado
     return estado
 
 
