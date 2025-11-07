@@ -268,7 +268,6 @@ def marketing_co_branding(estado):
         estado["TurnosVentasExtra"] = 2
 
     return estado
-    return estado
 
 
 def marketing_no_hacer_nada(estado):
