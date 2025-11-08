@@ -36,7 +36,14 @@ def calcular_estado_inicial():
         "BrandingActivo":                    False,
         "MantenimientoHecho":                False,
         "EcommerceActivo":                   False,
-        "InventarioMesAnterior":             0
+        
+        # Banadera de creditos activos
+        "CreditoConcedido":                  False,
+
+        # Contador de Turnos de prohibicion
+        "TurnosProhibicion":                 0,
+
+        "InventarioMesAnterior":             0,
     }
 
 def calcular_estado_final(estado):
