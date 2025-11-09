@@ -34,7 +34,7 @@ def produccion_producir(estado):
     maquinas_activas = int(partes[1])  # Elegiumos 1 xq son las maquinas activas
 
     insumos_por_maquina = 40000
-    produccion_por_maquina = 20000
+    produccion_por_maquina = 2000
     total_insumos_necesarios = 0
     total_produccion = 0
 
