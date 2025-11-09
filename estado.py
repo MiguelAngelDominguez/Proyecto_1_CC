@@ -43,6 +43,9 @@ def calcular_estado_inicial():
         # Contador de Turnos de prohibicion
         "TurnosProhibicion":                 0,
 
+        # Contador de Turnos de prohibicion
+        "TurnosProhibicion":                 0,
+
         "InventarioMesAnterior":             0,
     }
 
