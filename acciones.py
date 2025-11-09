@@ -23,6 +23,43 @@ def produccion_producir(estado):
         • Esto se debe a que el proceso productivo tiene diferentes fases
     - Si no hay suficientes insumos no se puede producir.
     """
+    if estado["Prohibir Produccion"]:
+        estado["TurnosProhibidos"] += 1
+        return estado
+    else:
+        estado["TurnosProhibidos"] = 0
+
+    maquinas_str = estado["Maquinas (total/activas/dañadas)"]
+    partes = maquinas_str.split('/')
+    maquinas_activas = int(partes[1])  # Elegiumos 1 xq son las maquinas activas
+
+    insumos_por_maquina = 40000
+    produccion_por_maquina = 20000
+    total_insumos_necesarios = 0
+    total_produccion = 0
+
+    maquinas_que_producen = 0
+    for i in range(maquinas_activas):
+        insumos_necesarios = (maquinas_que_producen + 1) * insumos_por_maquina
+        if estado["Insumos disponibles"] >= insumos_necesarios:
+            maquinas_que_producen += 1
+        else:
+            break
+    if maquinas_que_producen > 0:
+        total_insumos_necesarios = maquinas_que_producen * insumos_por_maquina
+        total_produccion = maquinas_que_producen * produccion_por_maquina
+
+    empleados_base = 4
+    empleados_adicionales = estado["Cantidad de empleados"] - empleados_base
+
+    if empleados_adicionales > 0:
+        bonificacion = total_produccion * (empleados_adicionales * 0.10)
+        total_produccion += bonificacion
+
+    estado["Insumos disponibles"] -= total_insumos_necesarios
+    estado["Inventario"] += total_produccion
+
+    estado["TurnosProduccionExtra"] += 2
     return estado
 
 
