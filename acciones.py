@@ -25,6 +25,7 @@ def produccion_producir(estado):
     """
     return estado
 
+
 def produccion_pedido_encargo(estado):
     """
     2. Producir por encargo:
@@ -362,6 +363,19 @@ def compras_negociar_credito(estado):
     - Si no hay dinero, debes pedir un préstamo al 12% de interes
         • Es decir, haces la negociación al crédito, y te haces una deuda de S/ 2,240.
     """
+    if not estado["CreditoConcedido"]:
+            COSTO_INMEDIATO = 2000.0
+            INTERES = 1.12
+            
+            caja = float(estado.get("Caja disponible", 0.0))
+            deuda = float(estado.get("Deuda pendiente", 0.0))
+            if caja >= COSTO_INMEDIATO:
+                estado["Caja disponible"] = caja - COSTO_INMEDIATO
+            else:
+                estado["Caja disponible"] = 0.0
+                estado["Deuda pendiente"] = deuda + (COSTO_INMEDIATO * INTERES)
+            
+            estado["CreditoConcedido"] = True
     return estado
 
 
