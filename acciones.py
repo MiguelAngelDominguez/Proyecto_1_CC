@@ -244,8 +244,8 @@ def marketing_abrir_ecommerce(estado):
 
 def marketing_co_branding(estado):
     """
-    5. Alianza co-branding con maca o influencer muy popular:
-    - Gasta S/ 3 000 de “Caja disponible”.
+    5. Alianza co-branding con marca o influencer muy popular:
+    - Gasta S/ 3000 de “Caja disponible”.
     - Añade “DemandaExtraTemporal” de +300,000 este mes y +100,000 el proximo mes.
       • Es posible que en alianzas con marcas o influencer gigantescos
         no tengamos la capacidad para producir la cantidad de demanda que se genere.
@@ -255,17 +255,30 @@ def marketing_co_branding(estado):
     - Si no hay dinero, debes pedir un préstamo al 12% de interes
         • Es decir, realizas la alianza, y te haces una deuda de S/ 3,360
     """
-    # Gasto en caja
-    estado["Caja disponible"] -= 3000
+    costo_alianza = 3000
+    interes = 0.12
+    caja_disponible = estado["Caja disponible"]
 
-    # Demanda extra este mes y el siguiente
+    # En caso no haya dinero suficiente en caja, pedir un préstamo
+    if caja_disponible < costo_alianza:
+        deuda = (costo_alianza - caja_disponible) * (1 + interes)
+        estado["Deuda pendiente"] += deuda
+        estado["Caja Disponible"] = 0
+    else:
+        estado["Caja disponible"] -= costo_alianza
+
+    # Demanda extra para este mes y el siguiente
     estado["DemandaExtraTemporal"] += 300000
     estado["DemandaExtraProximoMes"] = 100000
-    # Aumenta las ventas en 20%
+
+    # Se generan 2 turnos
     if "TurnosVentasExtra" in estado:
         estado["TurnosVentasExtra"] += 2
     else:
         estado["TurnosVentasExtra"] = 2
+
+    """if estado["Inventario"] > 0:
+        estado["Unidades vendidas"] *= 1.2"""
 
     return estado
 
