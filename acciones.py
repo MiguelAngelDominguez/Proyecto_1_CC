@@ -277,8 +277,8 @@ def marketing_co_branding(estado):
     else:
         estado["TurnosVentasExtra"] = 2
 
-    """if estado["Inventario"] > 0:
-        estado["Unidades vendidas"] *= 1.2"""
+    if estado["Inventario"] > 0:
+        estado["Unidades vendidas"] *= 1.2
 
     return estado
 
