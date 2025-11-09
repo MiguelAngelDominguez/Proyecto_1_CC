@@ -15,6 +15,7 @@ def calcular_estado_inicial():
         "Unidades vendidas":                 0,
         "Insumos disponibles":               100,
         "Cantidad de empleados":             empleados,
+        "EmpleadosTemporales":               0,
         "Costo por empleado":                costo_emp,
         "Sueldos por pagar":                 empleados * costo_emp,
         "Deuda pendiente":                   20000,
@@ -31,7 +32,6 @@ def calcular_estado_inicial():
         # Contadores y flags temporales
         "TurnosProduccionExtra":             0,
         "DemandaExtraTemporal":              0,
-        "EmpleadosTemporales":               0,
         "MejoraProceso":                     False,
         "BrandingActivo":                    False,
         "MantenimientoHecho":                False,
@@ -136,5 +136,9 @@ def calcular_estado_final(estado):
     # 8) Perdida de inventario:
     estado["Inventario"]            = estado["Inventario"]
 
-
+    # 9) Turnos de rh_contratar_personal_temporal:
+    estado['TurnoEmpleadostemporales'] = estado['TurnoEmpleadostemporales'] - 1
+    if estado['TurnoEmpleadostemporales'] == 0:
+        if estado['Empleados Temporales'] != 0:
+            estado['Empleados Temporales'] = 0
     return estado
