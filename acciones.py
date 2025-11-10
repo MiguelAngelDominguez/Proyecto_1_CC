@@ -326,7 +326,7 @@ def marketing_co_branding(estado):
     # Aplicar aumento ventas si hay inverntario
     if estado["Inventario"] > 0:
         # Se asignan 2 turnos
-        estado["TurnosVentasExtra"] = 2
+        estado["TurnosVentasExtra"] += 2
 
         # Aumento del 20% de ventas
         estado["Unidades vendidas"] *= 1.20
