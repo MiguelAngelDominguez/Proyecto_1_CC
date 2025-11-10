@@ -305,23 +305,40 @@ def marketing_co_branding(estado):
     interes = 0.12
     caja_disponible = estado["Caja disponible"]
 
-    # En caso no haya dinero suficiente en caja, pedir un préstamo
     if caja_disponible < costo_alianza:
+        # Si no hay dinero suficiente en caja, se pide un préstamo por la diferencia con intereses
         deuda = (costo_alianza - caja_disponible) * (1 + interes)
         estado["Deuda pendiente"] += deuda
         estado["Caja disponible"] = 0
     else:
+        # Si hay dinero en caja, se descuenta directamente de la caja
         estado["Caja disponible"] -= costo_alianza
 
-    # Demanda extra para este mes y el siguiente
-    estado["DemandaExtraTemporal"] += 300000
-    estado["DemandaExtraProximoMes"] = 100000
+    if estado["DemandaExtraProximoMes"] > 0:
+        estado["DemandaExtraTemporal"] += estado["DemandaExtraProximoMes"]
+        estado["DemandaExtraProximoMes"] = 0
 
-    # Se generan 2 turnos
-    if "TurnosVentasExtra" in estado:
-        estado["TurnosVentasExtra"] += 2
-    else:
-        estado["TurnosVentasExtra"] = 2
+    # Aplicar demanda solo del mes actual
+    estado["DemandaExtraTemporal"] += 300000
+    # Guarda la demanda que se aplicará el próximo mes
+    estado["DemandaExtraProximoMes"] += 100000
+
+    # Aplicar aumento ventas si hay inverntario
+    if estado["Inventario"] > 0:
+        # Si ya existe el contador de turnos extra se suman 2 turnos
+        if "TurnosVentasExtra" in estado:
+            estado["TurnosVentasExtra"] += 2
+        else:
+            estado["TurnosVentasExtra"] = 2
+
+        # Aumento del 20% de ventas
+        estado["Unidades vendidas"] *= 1.20
+        # Se reduce el contador de turnos cada vez que se aplica el aumento de ventas
+        estado["TurnosVentasExtra"] -= 1
+
+        # Si ya no quedan turnos, el aumento de ventas desaparece
+        if estado["TurnosVentasExtra"] <= 0:
+            estado["TurnosVentasExtra"] = 0
 
     return estado
 
