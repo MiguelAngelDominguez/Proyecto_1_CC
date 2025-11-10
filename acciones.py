@@ -301,34 +301,36 @@ def marketing_co_branding(estado):
     - Si no hay dinero, debes pedir un préstamo al 12% de interes
         • Es decir, realizas la alianza, y te haces una deuda de S/ 3,360
     """
-    costo_alianza = 3000
-    interes = 0.12
-    caja_disponible = estado["Caja disponible"]
+    costo_alianza = 3000        # Monto que cuesta realizar la alianza
+    interes = 0.12              # Interés que se aplica si se pide préstamo
+    caja_disponible = estado["Caja disponible"] # Dinero actual de la empresa
 
     if caja_disponible < costo_alianza:
-        # Si no hay dinero suficiente en caja, se pide un préstamo por la diferencia con intereses
+        # Si no hay dinero suficiente en caja
+        # Se pide un préstamo por la parte que falta con intereses
         deuda = (costo_alianza - caja_disponible) * (1 + interes)
+        # Se suma esta deuda al total pendiente
         estado["Deuda pendiente"] += deuda
+        # Como se uso todo el dinero disponible, la caja queda en cero
         estado["Caja disponible"] = 0
     else:
-        # Si hay dinero en caja, se descuenta directamente de la caja
+        # Si hay dinero en caja, se descuenta el gasto de la alianza
         estado["Caja disponible"] -= costo_alianza
 
-    # Aplicar aumento ventas si hay inventario
+    # Se aplica el aumento de ventas si hay inventario
     if estado["Inventario"] > 0:
-        # Se asignan 2 turnos
         estado["TurnosVentasExtra"] += 1
+        # Aumento del 20% de ventas
         estado["Unidades vendidas"] *= 1.20
+        # Primer turno
         if estado["TurnosVentasExtra"] == 1:
             # Aplicar demanda solo del mes actual
             estado["DemandaExtraTemporal"] += 300000
-            # Aumento del 20% de ventas
-            estado["Unidades vendidas"] *= 1.20
-        #
+        # Segundo turno
         if estado["TurnosVentasExtra"] == 2:
-            # Guarda la demanda que se aplicará el próximo mes
+            # Se aplica la demanda extra para el próximo mes
             estado["DemandaExtraProximoMes"] += 100000
-            #
+            # Se restablece el contador
             estado["TurnosVentasExtra"] = 0
 
     return estado
