@@ -403,33 +403,71 @@ def compras_negociar_precio(estado):
     """
     return estado
 
-def compras_negociar_credito(estado:dict):
+def compras_negociar_credito(estado: dict):
     """
-    6. Negociar credito con proveedores:
+    6. Negociar crédito con proveedores:
     - Gasta S/ 2 000 de “Caja disponible”.
-    - Fija el flag “CreditoConcedido = True” para que el pago de mercaderia
-      se postergue hasta 90 dias (es decir, 3 turnos).
-    - El efecto es permanente, los insumos que compres, se paga en 90 dias.
-    - Debes pensar una estructura de datos que nos permita saber cuantos soles estamos comprando a 90 dias (3 turnos)
-      y cuantos turnos le queda a cada cuenta por pagar. Al momento de pagar, el dinero puede salir de caja o aumentar la deuda.
-    - Si no hay dinero, debes pedir un préstamo al 12% de interes
-        • Es decir, haces la negociación al crédito, y te haces una deuda de S/ 2,240.
+    - Fija el flag “CreditoConcedido = True” para que el pago de mercadería
+      se postergue hasta 90 días (es decir, 3 turnos).
+    - El efecto es permanente; los insumos que compres se pagarán en 90 días.
+    - Debes pensar una estructura de datos que nos permita saber cuántos soles
+      estamos comprando a 90 días (3 turnos) y cuántos turnos le queda a cada
+      cuenta por pagar. Al momento de pagar, el dinero puede salir de caja o
+      aumentar la deuda.
+    - Si no hay dinero, debes pedir un préstamo al 12% de interés:
+        • Es decir, haces la negociación al crédito y generas una deuda de S/ 2,240.
     """
+
+    # Verificamos que existan las <keys> en el diccionario estado
+    # <keys> requeridas:
+    #  - "CreditoConcedido"
+    #  - "CuentasAPagarACredito"
+
+    # El método setdefault garantiza que estas claves existan; si ya existen, no altera su valor.
     estado.setdefault("CreditoConcedido", False)
     estado.setdefault("CuentasAPagarACredito", [])
 
+    # Verificamos si ya se concedió el crédito:
+    #  - Si el flag es True, quiere decir que tiene un crédito activo; por lo tanto, no tiene sentido volver a hacerlo.
+    #  - Si el flag es False, quiere decir que no tiene un crédito activo; procede con todo el flujo interno del if.
+    
+    # Esto implementa el principio de IDEMPOTENCIA, es decir: hacer la misma acción
+    # dos o más veces no producirá efectos adicionales después de la primera ejecución.
     if not estado["CreditoConcedido"]:
+            # Monto que debe pagarse en el momento de realizar la negociación.
             COSTO_INMEDIATO = 2000.0
+            # Factor que representa un préstamo con 12% de interés.
             INTERES = 1.12
-            
+
+            # Almacenamos los valores de las <keys> en variables, para facilitar su acceso y manipulación
+            # <keys> referidas:
+            #  - "Caja disponible"
+            #  - "Deuda pendiente"
+
+            # Al usar "get", aseguramos que el flujo no falle incluso si la clave no existiera.
             caja = float(estado.get("Caja disponible", 0.0))
             deuda = float(estado.get("Deuda pendiente", 0.0))
+
+            # Verificamos que el monto de la caja disponible en ese momento sea mayor o igual al costo inmediato.
             if caja >= COSTO_INMEDIATO:
+                # Caso True:
+                #      Almacenamos en la <key> "Caja disponible" su nuevo valor, que será
+                #      el saldo disponible menos S/ 2 000.
                 estado["Caja disponible"] = caja - COSTO_INMEDIATO
             else:
+                # Caso False:
+                #      Almacenamos el valor 0 en la <key> "Caja disponible".
+                #      La <key> "Deuda pendiente" será igual a la suma de la deuda previa
+                #      y del producto del costo inmediato por el interés.
+                #
+                #      Esto modela una situación financiera real: la empresa avanza con la negociación,
+                #      pero lo hace a costa de endeudarse.
                 estado["Caja disponible"] = 0.0
                 estado["Deuda pendiente"] = deuda + (COSTO_INMEDIATO * INTERES)
             
+            # Una vez realizado el gasto (o la deuda) y completada la negociación, marcamos que el crédito ha sido concedido.
+            # A partir de este punto, todas las compras de insumos deberán registrarse como compras a crédito, es decir,
+            # agregarse a la lista de "CuentasAPagarACredito" con una duración de 90 días (3 turnos).
             estado["CreditoConcedido"] = True
     return estado
 
