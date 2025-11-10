@@ -138,9 +138,4 @@ def calcular_estado_final(estado):
     # 8) Perdida de inventario:
     estado["Inventario"]            = estado["Inventario"]
 
-    # 9) Turnos de rh_contratar_personal_temporal:
-    estado['TurnoEmpleadostemporales'] = estado['TurnoEmpleadostemporales'] - 1
-    if estado['TurnoEmpleadostemporales'] == 0:
-        if estado['Empleados Temporales'] != 0:
-            estado['Empleados Temporales'] = 0
     return estado
