@@ -154,7 +154,7 @@ def rh_contratar_personal_temporal(estado):
     """
     estado['TurnoEmpleadostemporales'] = 2
     if estado['Caja disponible'] < 10000:
-        estado['Deuda pendiente'] += (10000 - estado['Caja disponible']) * 0.12
+        estado['Deuda pendiente'] += (10000 - estado['Caja disponible']) * 1.12
     else:
         estado['Caja disponible'] = estado['Caja disponible'] - 10000
     estado['Empleados Temporales'] = 4
