@@ -311,7 +311,7 @@ def marketing_co_branding(estado):
         deuda = (costo_alianza - caja_disponible) * (1 + interes)
         # Se suma esta deuda al total pendiente
         estado["Deuda pendiente"] += deuda
-        # Como se uso todo el dinero disponible, la caja queda en cero
+        # Como se usó tod el dinero disponible, la caja queda en cero
         estado["Caja disponible"] = 0
     else:
         # Si hay dinero en caja, se descuenta el gasto de la alianza
