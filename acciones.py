@@ -301,43 +301,36 @@ def marketing_co_branding(estado):
     - Si no hay dinero, debes pedir un préstamo al 12% de interes
         • Es decir, realizas la alianza, y te haces una deuda de S/ 3,360
     """
-    costo_alianza = 3000
-    interes = 0.12
-    caja_disponible = estado["Caja disponible"]
+    costo_alianza = 3000        # Monto que cuesta realizar la alianza
+    interes = 0.12              # Interés que se aplica si se pide préstamo
+    caja_disponible = estado["Caja disponible"] # Dinero actual de la empresa
 
     if caja_disponible < costo_alianza:
-        # Si no hay dinero suficiente en caja, se pide un préstamo por la diferencia con intereses
+        # Si no hay dinero suficiente en caja
+        # Se pide un préstamo por la parte que falta con intereses
         deuda = (costo_alianza - caja_disponible) * (1 + interes)
+        # Se suma esta deuda al total pendiente
         estado["Deuda pendiente"] += deuda
+        # Como se usó tod el dinero disponible, la caja queda en cero
         estado["Caja disponible"] = 0
     else:
-        # Si hay dinero en caja, se descuenta directamente de la caja
+        # Si hay dinero en caja, se descuenta el gasto de la alianza
         estado["Caja disponible"] -= costo_alianza
 
-    if estado["DemandaExtraProximoMes"] > 0:
-        estado["DemandaExtraTemporal"] += estado["DemandaExtraProximoMes"]
-        estado["DemandaExtraProximoMes"] = 0
-
-    # Aplicar demanda solo del mes actual
-    estado["DemandaExtraTemporal"] += 300000
-    # Guarda la demanda que se aplicará el próximo mes
-    estado["DemandaExtraProximoMes"] += 100000
-
-    # Aplicar aumento ventas si hay inverntario
+    # Se aplica el aumento de ventas si hay inventario
     if estado["Inventario"] > 0:
-        # Si ya existe el contador de turnos extra se suman 2 turnos
-        if "TurnosVentasExtra" in estado:
-            estado["TurnosVentasExtra"] += 2
-        else:
-            estado["TurnosVentasExtra"] = 2
-
+        estado["TurnosVentasExtra"] += 1
         # Aumento del 20% de ventas
         estado["Unidades vendidas"] *= 1.20
-        # Se reduce el contador de turnos cada vez que se aplica el aumento de ventas
-        estado["TurnosVentasExtra"] -= 1
-
-        # Si ya no quedan turnos, el aumento de ventas desaparece
-        if estado["TurnosVentasExtra"] <= 0:
+        # Primer turno
+        if estado["TurnosVentasExtra"] == 1:
+            # Aplicar demanda solo del mes actual
+            estado["DemandaExtraTemporal"] += 300000
+        # Segundo turno
+        if estado["TurnosVentasExtra"] == 2:
+            # Se aplica la demanda extra para el próximo mes
+            estado["DemandaExtraProximoMes"] += 100000
+            # Se restablece el contador
             estado["TurnosVentasExtra"] = 0
 
     return estado
