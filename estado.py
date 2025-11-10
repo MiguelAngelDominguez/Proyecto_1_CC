@@ -42,7 +42,7 @@ def calcular_estado_inicial():
         "CreditoConcedido":                  False,
 
         # Contador de Turnos de prohibicion
-        "TurnosProhibicion":                 0,
+        "TurnosProhibidos":                 0,
 
         "InventarioMesAnterior":             0,
     }
