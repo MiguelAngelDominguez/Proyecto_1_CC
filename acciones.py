@@ -302,7 +302,7 @@ def marketing_co_branding(estado):
     if caja_disponible < costo_alianza:
         deuda = (costo_alianza - caja_disponible) * (1 + interes)
         estado["Deuda pendiente"] += deuda
-        estado["Caja Disponible"] = 0
+        estado["Caja disponible"] = 0
     else:
         estado["Caja disponible"] -= costo_alianza
 
@@ -315,9 +315,6 @@ def marketing_co_branding(estado):
         estado["TurnosVentasExtra"] += 2
     else:
         estado["TurnosVentasExtra"] = 2
-
-    if estado["Inventario"] > 0:
-        estado["Unidades vendidas"] *= 1.2
 
     return estado
 
