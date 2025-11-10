@@ -158,6 +158,8 @@ def rh_contratar_personal_temporal(estado):
     if estado['Caja disponible'] < 10000:
         # si es menor entonces hacemos un prestamo con el 12% de interes (ojo que pedimos prestado lo que nos falta para contratar)
         estado['Deuda pendiente'] += (10000 - estado['Caja disponible']) * 1.12
+        # ponemos a la caja a 0
+        estado['Caja disponible'] = 0
     else:
         # sino, solo le restamos 10000
         estado['Caja disponible'] = estado['Caja disponible'] - 10000
