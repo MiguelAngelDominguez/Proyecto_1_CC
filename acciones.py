@@ -50,7 +50,7 @@ def produccion_producir(estado):
         total_produccion = maquinas_que_producen * produccion_por_maquina
 
     empleados_base = 4
-    empleados_adicionales = estado["Cantidad de empleados"] - empleados_base
+    empleados_adicionales = estado["Cantidad de empleados"] - estado["Empleados Temporales"]
 
     if empleados_adicionales > 0:
         bonificacion = total_produccion * (empleados_adicionales * 0.10)
