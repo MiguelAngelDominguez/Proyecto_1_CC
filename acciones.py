@@ -410,7 +410,7 @@ def compras_negociar_precio(estado):
     """
     return estado
 
-def compras_negociar_credito(estado):
+def compras_negociar_credito(estado:dict):
     """
     6. Negociar credito con proveedores:
     - Gasta S/ 2 000 de “Caja disponible”.
@@ -422,6 +422,10 @@ def compras_negociar_credito(estado):
     - Si no hay dinero, debes pedir un préstamo al 12% de interes
         • Es decir, haces la negociación al crédito, y te haces una deuda de S/ 2,240.
     """
+    estado.setdefault("CreditoConcedido", False)
+    estado.setdefault("CuentasAPagarACredito", [])
+
+
     if not estado["CreditoConcedido"]:
             COSTO_INMEDIATO = 2000.0
             INTERES = 1.12
