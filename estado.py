@@ -28,7 +28,6 @@ def calcular_estado_inicial():
         "Prohibir Compras":                  False,
         "Prohibir Importaciones":            False,
         "Fondo emergencia":                  False,
-        'TurnoEmpleadostemporales':          0,
 
         # Contadores y flags temporales
         "TurnosProduccionExtra":             0,
@@ -38,6 +37,7 @@ def calcular_estado_inicial():
         "MantenimientoHecho":                False,
         "EcommerceActivo":                   False,
         "InventarioMesAnterior":             0,
+        'TurnoEmpleadostemporales':          0,
         # Banadera de creditos activos
         "CreditoConcedido":                  False,
 
