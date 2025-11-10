@@ -28,7 +28,6 @@ def calcular_estado_inicial():
         "Prohibir Compras":                  False,
         "Prohibir Importaciones":            False,
         "Fondo emergencia":                  False,
-        'TurnoEmpleadostemporales':          0,
 
         # Contadores y flags temporales
         "TurnosProduccionExtra":             0,
@@ -38,6 +37,7 @@ def calcular_estado_inicial():
         "MantenimientoHecho":                False,
         "EcommerceActivo":                   False,
         "InventarioMesAnterior":             0,
+        'TurnoEmpleadostemporales':          0,
         # Banadera de creditos activos
         "CreditoConcedido":                  False,
 
@@ -138,9 +138,4 @@ def calcular_estado_final(estado):
     # 8) Perdida de inventario:
     estado["Inventario"]            = estado["Inventario"]
 
-    # 9) Turnos de rh_contratar_personal_temporal:
-    estado['TurnoEmpleadostemporales'] = estado['TurnoEmpleadostemporales'] - 1
-    if estado['TurnoEmpleadostemporales'] == 0:
-        if estado['Empleados Temporales'] != 0:
-            estado['Empleados Temporales'] = 0
     return estado
