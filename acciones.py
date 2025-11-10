@@ -418,7 +418,6 @@ def compras_negociar_credito(estado:dict):
     estado.setdefault("CreditoConcedido", False)
     estado.setdefault("CuentasAPagarACredito", [])
 
-
     if not estado["CreditoConcedido"]:
             COSTO_INMEDIATO = 2000.0
             INTERES = 1.12
