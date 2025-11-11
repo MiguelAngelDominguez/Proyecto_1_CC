@@ -84,6 +84,8 @@ def produccion_producir(estado):
     return estado
 
 
+
+
 def produccion_pedido_encargo(estado):
     """
     2. Producir por encargo:
@@ -166,29 +168,48 @@ def rh_contratar_personal_permanente(estado):
 
 def rh_contratar_personal_temporal(estado):
     """
-    2. Outsourcing temporal:
-    - Paga S/ 10 000 (pago unico unico) para sumar 4 empleados temporales solo este turno.
-    - Aumenta la cantidad de empleados en 4, solo por este turno
-        • Si deseas, puedes crear una variable adicional para la cantidad de "EmpleadosTemporales"
-    - Si no hay dinero, debes pedir un préstamo al 12% de interes
-        • Es decir, cuentas con los 4 empleados extra por este turno, y te haces una deuda de S/ 11,200
+    Outsourcing temporal:
+    - Paga S/ 10 000 (pago único) para sumar 4 empleados temporales sólo este turno.
+    - Si no hay suficiente dinero, se financia la diferencia con un préstamo al 12% (prorrateado).
+    - Registra el número de empleados temporales y los turnos que quedan.
     """
-    # Añadimos al diccionario un nuevo elemento y le damos el valor de 2
-    estado['TurnoEmpleadostemporales'] = 2
-    # vemos suficiente dinero en la caja para pagar a los empleados
-    if estado['Caja disponible'] < 10000:
-        # si es menor entonces hacemos un prestamo con el 12% de interes (ojo que pedimos prestado lo que nos falta para contratar)
-        estado['Deuda pendiente'] += (10000 - estado['Caja disponible']) * 1.12
-        # ponemos a la caja a 0
-        estado['Caja disponible'] = 0
-    else:
-        # sino, solo le restamos 10000
-        estado['Caja disponible'] = estado['Caja disponible'] - 10000
-    # ahora redondeamos la deuda pendiente a 2 para mas orden visual
-    estado['Deuda pendiente'] = round(estado['Deuda pendiente'], 2)
-    # establecemos cuantos empleados contratamos
-    estado['Empleados Temporales'] = 4
+    # --- Inicializar claves mínimas sin sobrescribir valores existentes ---
+    estado.setdefault("Caja disponible", 0.0)
+    estado.setdefault("Deuda pendiente", 0.0)
+    # clave para empleados permanentes (si existe), y para temporales
+    estado.setdefault("Empleados", estado.get("Empleados", 0))
+    estado.setdefault("EmpleadosTemporales", 0)
+    estado.setdefault("TurnosEmpleadosTemporales", 0)
+
+    COSTO = 10000.0
+    INTERES = 1.12
+    NUEVOS_TEMPORALES = 4
+    DURACION_TURNOS = 1  # "solo este turno" -> 1
+
+    caja = float(estado.get("Caja disponible", 0.0))
+    deuda = float(estado.get("Deuda pendiente", 0.0))
+
+    # Usar la caja parcial y financiar sólo la diferencia (prorrateo)
+    pagado_con_caja = min(caja, COSTO)
+    faltante = COSTO - pagado_con_caja
+
+    # descontar lo pagado con caja
+    estado["Caja disponible"] = caja - pagado_con_caja  # normalmente 0 si caja < COSTO
+
+    # si hay faltante, convertir sólo esa parte en deuda con interes
+    if faltante > 0:
+        estado["Deuda pendiente"] = deuda + (faltante * INTERES)
+
+    # activar los empleados temporales por 1 turno (sumar a los existentes)
+    estado["EmpleadosTemporales"] = estado.get("EmpleadosTemporales", 0) + NUEVOS_TEMPORALES
+    # si ya había turnos, aumentarlos o resetear según política; aquí agregamos DURACION_TURNOS
+    estado["TurnosEmpleadosTemporales"] = max(estado.get("TurnosEmpleadosTemporales", 0), DURACION_TURNOS)
+
+    # opcional: redondear deuda para presentación
+    estado["Deuda pendiente"] = round(estado["Deuda pendiente"], 2)
+
     return estado
+
 
 def rh_implementar_incentivos(estado):
     """
@@ -450,7 +471,7 @@ def compras_negociar_credito(estado: dict):
     # Verificamos si ya se concedió el crédito:
     #  - Si el flag es True, quiere decir que tiene un crédito activo; por lo tanto, no tiene sentido volver a hacerlo.
     #  - Si el flag es False, quiere decir que no tiene un crédito activo; procede con todo el flujo interno del if.
-    
+     
     # Esto implementa el principio de IDEMPOTENCIA, es decir: hacer la misma acción
     # dos o más veces no producirá efectos adicionales después de la primera ejecución.
     if not estado["CreditoConcedido"]:
