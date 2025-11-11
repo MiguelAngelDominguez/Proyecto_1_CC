@@ -4,62 +4,83 @@
 
 def produccion_producir(estado):
     """
-    1. Producir:
-    - Si existe el flag "Prohibir Produccion" (== True), no produce nada.
-        • Ademas, usted debe implementar algun mecanismo para contar cuantos turnos de la prohibicion van pasando
-    - Si no hay prohibicion, cada maquina realiza lo siguiente:
-        • Consume 40 000 insumos (resta de “Insumos disponibles”).
-          -> solo si Insumos disponibles ≥ 40 000, caso contrario, esa maquina no produce nada
-        • Añade 2,000 unidades al inventario (suma a “Inventario”).
-        • Marca que la produccion se realiza por dos turnos:
-            – Debe crear o incrementar “TurnosProduccionExtra” en 2,
-              para que en el siguiente turno se pueda volver a producir,
-              asi el jugador queda libre para realizar otra accion el siguiente turno.
-            - La produccion extra no consume insumos, y se hace desde calcular_estado_final, punto 7
-              (ver archivo estado.py)
-    - Por cada empleado adicional contratado, la produccion aumenta en 10%, sin gastar insumos.
-        • Esto se debe a que los empelados introducen eficiencias en el proceso productivo
-    - Todos los turnos se peude producir, es decir, las maquinas no quedan ocupadas.
-        • Esto se debe a que el proceso productivo tiene diferentes fases
-    - Si no hay suficientes insumos no se puede producir.
-    """
+       1. Producir:
+       - Si existe el flag "Prohibir Produccion" (== True), no produce nada.
+           • Ademas, usted debe implementar algun mecanismo para contar cuantos turnos de la prohibicion van pasando
+       - Si no hay prohibicion, cada maquina realiza lo siguiente:
+           • Consume 40 000 insumos (resta de “Insumos disponibles”).
+             -> solo si Insumos disponibles ≥ 40 000, caso contrario, esa maquina no produce nada
+           • Añade 2,000 unidades al inventario (suma a “Inventario”).
+           • Marca que la produccion se realiza por dos turnos:
+               – Debe crear o incrementar “TurnosProduccionExtra” en 2,
+                 para que en el siguiente turno se pueda volver a producir,
+                 asi el jugador queda libre para realizar otra accion el siguiente turno.
+               - La produccion extra no consume insumos, y se hace desde calcular_estado_final, punto 7
+                 (ver archivo estado.py)
+       - Por cada empleado adicional contratado, la produccion aumenta en 10%, sin gastar insumos.
+           • Esto se debe a que los empelados introducen eficiencias en el proceso productivo
+       - Todos los turnos se peude producir, es decir, las maquinas no quedan ocupadas.
+           • Esto se debe a que el proceso productivo tiene diferentes fases
+       - Si no hay suficientes insumos no se puede producir.
+       """
+    
+    # Verificar prohibicion 
+    # Si la producción está prohibida, se cuenta el turno prohibido y la función termina.
     if estado["Prohibir Produccion"]:
         estado["TurnosProhibidos"] += 1
+        estado["Prohibir Produccion"] = False  # Se desactiva el flag de prohibición
         return estado
+
+    # Si no hay prohibición, se resetea el contador.
     else:
         estado["TurnosProhibidos"] = 0
 
+    # Extraemos el número de máquinas activas:
     maquinas_str = estado["Maquinas (total/activas/dañadas)"]
     partes = maquinas_str.split('/')
-    maquinas_activas = int(partes[1])  # Elegiumos 1 xq son las maquinas activas
+    maquinas_activas = int(partes[1])
 
+    # Creamos constantes y contadores
     insumos_por_maquina = 40000
     produccion_por_maquina = 2000
     total_insumos_necesarios = 0
     total_produccion = 0
-
     maquinas_que_producen = 0
+
+    # Calculamos la producción, verificando cuantas maquinas pueden producir:
     for i in range(maquinas_activas):
         insumos_necesarios = (maquinas_que_producen + 1) * insumos_por_maquina
+
         if estado["Insumos disponibles"] >= insumos_necesarios:
             maquinas_que_producen += 1
         else:
+            # Si no hay suficientes insumos para la siguiente máquina, se detiene el proceso.
             break
+
+    # Si hay producción, se calculan los totales base (insumos a gastar y productos fabricados).
     if maquinas_que_producen > 0:
         total_insumos_necesarios = maquinas_que_producen * insumos_por_maquina
         total_produccion = maquinas_que_producen * produccion_por_maquina
 
+    # Aplicar bonificación por empleados:
     empleados_base = 4
-    empleados_adicionales = estado["Cantidad de empleados"] - estado["Empleados Temporales"]
+    # Se calcula la cantidad de empleados que dan bonificación (adicionales a la base).
+    empleados_adicionales = estado["Cantidad de empleados"] - empleados_base + estado["EmpleadosTemporales"]
 
+    # Si hay empleados adicionales, se aumenta la producción un 10% por cada uno.
     if empleados_adicionales > 0:
         bonificacion = total_produccion * (empleados_adicionales * 0.10)
         total_produccion += bonificacion
 
+    # Actualizamos el estado
+    # Se consume la cantidad de insumos y se añade el total al inventario.
     estado["Insumos disponibles"] -= total_insumos_necesarios
     estado["Inventario"] += total_produccion
 
+    # Se programa la producción extra para los siguientes dos turnos.
     estado["TurnosProduccionExtra"] += 2
+
+    # Devolvemos el estado modificado
     return estado
 
 
@@ -469,7 +490,7 @@ def compras_negociar_credito(estado: dict):
             # agregarse a la lista de "CuentasAPagarACredito" con una duración de 90 días (3 turnos).
             estado["CreditoConcedido"] = True
     return estado
-
+    
 
 def compras_no_hacer_nada(estado):
     """
