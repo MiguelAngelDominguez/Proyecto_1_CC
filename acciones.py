@@ -317,21 +317,18 @@ def marketing_co_branding(estado):
         # Si hay dinero en caja, se descuenta el gasto de la alianza
         estado["Caja disponible"] -= costo_alianza
 
-    # Se aplica el aumento de ventas si hay inventario
+    # Aplicar demanda solo del mes actual
+    estado["DemandaExtraTemporal"] += 300000
+    # Se aplica la demanda extra para el próximo mes
+    estado["DemandaExtraProximoMes"] += 100000
+
+    # Se aplica el aumento de ventas si es que hay inventario
     if estado["Inventario"] > 0:
-        estado["TurnosVentasExtra"] += 1
-        # Aumento del 20% de ventas
-        estado["Unidades vendidas"] *= 1.20
-        # Primer turno
-        if estado["TurnosVentasExtra"] == 1:
-            # Aplicar demanda solo del mes actual
-            estado["DemandaExtraTemporal"] += 300000
-        # Segundo turno
-        if estado["TurnosVentasExtra"] == 2:
-            # Se aplica la demanda extra para el próximo mes
-            estado["DemandaExtraProximoMes"] += 100000
-            # Se restablece el contador
-            estado["TurnosVentasExtra"] = 0
+        estado["TurnosVentasExtra"] += 2
+        estado["MultiplicadorVentas"] = 1.20  # Ventas +20%
+    else:
+        estado["TurnosVentasExtra"] = 0
+        estado["MultiplicadorVentas"] = 1.0
 
     return estado
 
