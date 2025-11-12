@@ -27,7 +27,7 @@ def produccion_producir(estado):
     # Verificar prohibicion 
     # Si la producción está prohibida, se cuenta el turno prohibido y la función termina.
     if estado["Prohibir Produccion"]:
-        estado["TurnosProhibidos"] += 1  # Se desactiva el flag de prohibición
+        estado["TurnosProhibidos"] += 1
         return estado
 
     # Si no hay prohibición, se resetea el contador.
@@ -185,6 +185,8 @@ def rh_contratar_personal_temporal(estado):
     estado['Deuda pendiente'] = round(estado['Deuda pendiente'], 2)
     # establecemos cuantos empleados contratamos
     estado['Empleados Temporales'] = 4
+    # Registrar que estos empleados duran solo este turno
+    estado["TurnoEmpleadostemporales"] = 1
     return estado
 
 
@@ -347,8 +349,11 @@ def marketing_co_branding(estado):
     if estado["Inventario"] > 0:
         estado["TurnosVentasExtra"] += 2
         estado["MultiplicadorVentas"] = 1.20
+    else:
+        estado["MultiplicadorVentas"] = 1.0
 
     return estado
+
 
 
 def marketing_no_hacer_nada(estado):
