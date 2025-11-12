@@ -28,7 +28,6 @@ def produccion_producir(estado):
     # Si la producción está prohibida, se cuenta el turno prohibido y la función termina.
     if estado["Prohibir Produccion"]:
         estado["TurnosProhibidos"] += 1
-        estado["Prohibir Produccion"] = False  # Se desactiva el flag de prohibición
         return estado
 
     # Si no hay prohibición, se resetea el contador.
@@ -173,40 +172,26 @@ def rh_contratar_personal_temporal(estado):
     - Si no hay suficiente dinero, se financia la diferencia con un préstamo al 12% (prorrateado).
     - Registra el número de empleados temporales y los turnos que quedan.
     """
-    # --- Inicializar claves mínimas sin sobrescribir valores existentes ---
-    estado.setdefault("Caja disponible", 0.0)
-    estado.setdefault("Deuda pendiente", 0.0)
-    # clave para empleados permanentes (si existe), y para temporales
-    estado.setdefault("Empleados", estado.get("Empleados", 0))
-    estado.setdefault("EmpleadosTemporales", 0)
-    estado.setdefault("TurnosEmpleadosTemporales", 0)
+    costo_contratacion = 10000     # Pago único por outsourcing
+    empleados_temporales = 4       # Empleados adicionales este turno
+    interes = 0.12                 # Interés del préstamo
 
-    COSTO = 10000.0
-    INTERES = 1.12
-    NUEVOS_TEMPORALES = 4
-    DURACION_TURNOS = 1  # "solo este turno" -> 1
+    # Verificar si hay dinero suficiente
+    if estado["Caja disponible"] >= costo_contratacion:
+        # Si hay suficiente dinero, solo descontamos el pago
+        estado["Caja disponible"] -= costo_contratacion
+    else:
+        # Verificamos si hay suficiente dinero en caja
+        # Calculamos cuánto falta y aplicamos el 12% de interés total
+        deuda = costo_contratacion * (1 + interes)  # 10,000 + 12% = 11,200
+        estado["Deuda pendiente"] += deuda
+        estado["Caja disponible"] = 0   # Caja queda vacía
 
-    caja = float(estado.get("Caja disponible", 0.0))
-    deuda = float(estado.get("Deuda pendiente", 0.0))
+    # Aplicar empleados temporales
+    estado["EmpleadosTemporales"] = empleados_temporales
 
-    # Usar la caja parcial y financiar sólo la diferencia (prorrateo)
-    pagado_con_caja = min(caja, COSTO)
-    faltante = COSTO - pagado_con_caja
-
-    # descontar lo pagado con caja
-    estado["Caja disponible"] = caja - pagado_con_caja  # normalmente 0 si caja < COSTO
-
-    # si hay faltante, convertir sólo esa parte en deuda con interes
-    if faltante > 0:
-        estado["Deuda pendiente"] = deuda + (faltante * INTERES)
-
-    # activar los empleados temporales por 1 turno (sumar a los existentes)
-    estado["EmpleadosTemporales"] = estado.get("EmpleadosTemporales", 0) + NUEVOS_TEMPORALES
-    # si ya había turnos, aumentarlos o resetear según política; aquí agregamos DURACION_TURNOS
-    estado["TurnosEmpleadosTemporales"] = max(estado.get("TurnosEmpleadosTemporales", 0), DURACION_TURNOS)
-
-    # opcional: redondear deuda para presentación
-    estado["Deuda pendiente"] = round(estado["Deuda pendiente"], 2)
+    # Registrar que estos empleados duran solo este turno
+    estado["TurnoEmpleadostemporales"] = 1
 
     return estado
 
