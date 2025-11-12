@@ -172,13 +172,6 @@ def rh_contratar_personal_temporal(estado):
     - Si no hay suficiente dinero, se financia la diferencia con un préstamo al 12% (prorrateado).
     - Registra el número de empleados temporales y los turnos que quedan.
     """
-    # --- Inicializar claves mínimas sin sobrescribir valores existentes ---
-    estado.setdefault("Caja disponible", 0.0)
-    estado.setdefault("Deuda pendiente", 0.0)
-    # clave para empleados permanentes (si existe), y para temporales
-    estado.setdefault("Empleados", estado.get("Empleados", 0))
-    estado.setdefault("EmpleadosTemporales", 0)
-    estado.setdefault("TurnosEmpleadosTemporales", 0)
 
     COSTO = 10000.0
     INTERES = 1.12
@@ -365,12 +358,26 @@ def marketing_co_branding(estado):
     # Se aplica la demanda extra para el próximo mes
     estado["DemandaExtraProximoMes"] += 100000
 
-    # Se aplica el aumento de ventas si es que hay inventario
-    if estado["Inventario"] > 0:
-        estado["TurnosVentasExtra"] += 2
-        estado["MultiplicadorVentas"] = 1.20  # Ventas +20%
+    # Significa que recién vamos a aplicar el beneficio de +20% en ventas.
+    if estado["Inventario"] > 0 and estado["TurnosVentasExtra"] == 0:
+        # Activamos el bono durante 2 turnos consecutivos
+        estado["TurnosVentasExtra"] = 2
+        # Incrementamos las ventas en un 20%
+        estado["MultiplicadorVentas"] = 1.20
+
+    # Si el bono está en curso, no lo reiniciamos, simplemente reducimos su duración.
+    elif estado["TurnosVentasExtra"] > 0:
+        # Restamos un turno al contador del bono
+        estado["TurnosVentasExtra"] -= 1
+
+        # Si después de restar llega a 0, significa que ya terminó el beneficio
+        if estado["TurnosVentasExtra"] == 0:
+            # Restauramos las ventas al nivel normal (sin multiplicador)
+            estado["MultiplicadorVentas"] = 1.0
+
+    # En este caso, simplemente no se aplica ningún beneficio de ventas.
     else:
-        estado["TurnosVentasExtra"] = 0
+        # Aseguramos que las ventas estén en su nivel base
         estado["MultiplicadorVentas"] = 1.0
 
     return estado
@@ -485,7 +492,7 @@ def compras_negociar_credito(estado: dict):
             #  - "Deuda pendiente"
 
             # Al usar "get", aseguramos que el flujo no falle incluso si la clave no existiera.
-            caja = max(0.0, float(estado.get("Caja disponible", 0.0)))
+            caja = float(estado.get("Caja disponible", 0.0))
             deuda = float(estado.get("Deuda pendiente", 0.0))
 
             # Verificamos que el monto de la caja disponible en ese momento sea mayor o igual al costo inmediato.

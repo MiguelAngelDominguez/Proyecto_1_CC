@@ -45,7 +45,8 @@ def calcular_estado_inicial():
         "TurnosProhibidos":                  0,
 
         "TurnosVentasExtra":                 0,
-        "DemandaExtraProximoMes":            0
+        "DemandaExtraProximoMes":            0,
+        "MultiplicadorVentas":               0
     }
 
 def calcular_estado_final(estado):
