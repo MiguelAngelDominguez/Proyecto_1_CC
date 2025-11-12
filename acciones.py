@@ -172,34 +172,19 @@ def rh_contratar_personal_temporal(estado):
     - Si no hay suficiente dinero, se financia la diferencia con un préstamo al 12% (prorrateado).
     - Registra el número de empleados temporales y los turnos que quedan.
     """
-
-    COSTO = 10000.0
-    INTERES = 1.12
-    NUEVOS_TEMPORALES = 4
-    DURACION_TURNOS = 1  # "solo este turno" -> 1
-
-    caja = float(estado.get("Caja disponible", 0.0))
-    deuda = float(estado.get("Deuda pendiente", 0.0))
-
-    # Usar la caja parcial y financiar sólo la diferencia (prorrateo)
-    pagado_con_caja = min(caja, COSTO)
-    faltante = COSTO - pagado_con_caja
-
-    # descontar lo pagado con caja
-    estado["Caja disponible"] = caja - pagado_con_caja  # normalmente 0 si caja < COSTO
-
-    # si hay faltante, convertir sólo esa parte en deuda con interes
-    if faltante > 0:
-        estado["Deuda pendiente"] = deuda + (faltante * INTERES)
-
-    # activar los empleados temporales por 1 turno (sumar a los existentes)
-    estado["EmpleadosTemporales"] = estado.get("EmpleadosTemporales", 0) + NUEVOS_TEMPORALES
-    # si ya había turnos, aumentarlos o resetear según política; aquí agregamos DURACION_TURNOS
-    estado["TurnosEmpleadosTemporales"] = max(estado.get("TurnosEmpleadosTemporales", 0), DURACION_TURNOS)
-
-    # opcional: redondear deuda para presentación
-    estado["Deuda pendiente"] = round(estado["Deuda pendiente"], 2)
-
+    # vemos suficiente dinero en la caja para pagar a los empleados
+    if estado['Caja disponible'] < 10000:
+        # si es menor entonces hacemos un prestamo con el 12% de interes (ojo que pedimos prestado lo que nos falta para contratar)
+        estado['Deuda pendiente'] += (10000 - estado['Caja disponible']) * 1.12
+        # ponemos a la caja a 0
+        estado['Caja disponible'] = 0
+    else:
+        # sino, solo le restamos 10000
+        estado['Caja disponible'] = estado['Caja disponible'] - 10000
+    # ahora redondeamos la deuda pendiente a 2 para mas orden visual
+    estado['Deuda pendiente'] = round(estado['Deuda pendiente'], 2)
+    # establecemos cuantos empleados contratamos
+    estado['Empleados Temporales'] = 4
     return estado
 
 
@@ -358,27 +343,10 @@ def marketing_co_branding(estado):
     # Se aplica la demanda extra para el próximo mes
     estado["DemandaExtraProximoMes"] += 100000
 
-    # Significa que recién vamos a aplicar el beneficio de +20% en ventas.
-    if estado["Inventario"] > 0 and estado["TurnosVentasExtra"] == 0:
-        # Activamos el bono durante 2 turnos consecutivos
-        estado["TurnosVentasExtra"] = 2
-        # Incrementamos las ventas en un 20%
+    # Se aplica el aumento de ventas si es que hay inventario
+    if estado["Inventario"] > 0:
+        estado["TurnosVentasExtra"] += 2
         estado["MultiplicadorVentas"] = 1.20
-
-    # Si el bono está en curso, no lo reiniciamos, simplemente reducimos su duración.
-    elif estado["TurnosVentasExtra"] > 0:
-        # Restamos un turno al contador del bono
-        estado["TurnosVentasExtra"] -= 1
-
-        # Si después de restar llega a 0, significa que ya terminó el beneficio
-        if estado["TurnosVentasExtra"] == 0:
-            # Restauramos las ventas al nivel normal (sin multiplicador)
-            estado["MultiplicadorVentas"] = 1.0
-
-    # En este caso, simplemente no se aplica ningún beneficio de ventas.
-    else:
-        # Aseguramos que las ventas estén en su nivel base
-        estado["MultiplicadorVentas"] = 1.0
 
     return estado
 
