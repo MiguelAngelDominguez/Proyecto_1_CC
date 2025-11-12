@@ -366,27 +366,10 @@ def marketing_co_branding(estado):
     # Se aplica la demanda extra para el próximo mes
     estado["DemandaExtraProximoMes"] += 100000
 
-    # Significa que recién vamos a aplicar el beneficio de +20% en ventas.
-    if estado["Inventario"] > 0 and estado["TurnosVentasExtra"] == 0:
-        # Activamos el bono durante 2 turnos consecutivos
-        estado["TurnosVentasExtra"] = 2
-        # Incrementamos las ventas en un 20%
+    # Se aplica el aumento de ventas si es que hay inventario
+    if estado["Inventario"] > 0:
+        estado["TurnosVentasExtra"] += 2
         estado["MultiplicadorVentas"] = 1.20
-
-    # Si el bono está en curso, no lo reiniciamos, simplemente reducimos su duración.
-    elif estado["TurnosVentasExtra"] > 0:
-        # Restamos un turno al contador del bono
-        estado["TurnosVentasExtra"] -= 1
-
-        # Si después de restar llega a 0, significa que ya terminó el beneficio
-        if estado["TurnosVentasExtra"] == 0:
-            # Restauramos las ventas al nivel normal (sin multiplicador)
-            estado["MultiplicadorVentas"] = 1.0
-
-    # En este caso, simplemente no se aplica ningún beneficio de ventas.
-    else:
-        # Aseguramos que las ventas estén en su nivel base
-        estado["MultiplicadorVentas"] = 1.0
 
     return estado
 
