@@ -27,8 +27,7 @@ def produccion_producir(estado):
     # Verificar prohibicion 
     # Si la producción está prohibida, se cuenta el turno prohibido y la función termina.
     if estado["Prohibir Produccion"]:
-        estado["TurnosProhibidos"] += 1
-        estado["Prohibir Produccion"] = False  # Se desactiva el flag de prohibición
+        estado["TurnosProhibidos"] += 1  # Se desactiva el flag de prohibición
         return estado
 
     # Si no hay prohibición, se resetea el contador.
@@ -486,7 +485,7 @@ def compras_negociar_credito(estado: dict):
             #  - "Deuda pendiente"
 
             # Al usar "get", aseguramos que el flujo no falle incluso si la clave no existiera.
-            caja = float(estado.get("Caja disponible", 0.0))
+            caja = max(0.0, float(estado.get("Caja disponible", 0.0)))
             deuda = float(estado.get("Deuda pendiente", 0.0))
 
             # Verificamos que el monto de la caja disponible en ese momento sea mayor o igual al costo inmediato.
@@ -503,8 +502,8 @@ def compras_negociar_credito(estado: dict):
                 #
                 #      Esto modela una situación financiera real: la empresa avanza con la negociación,
                 #      pero lo hace a costa de endeudarse.
+                estado["Deuda pendiente"] = deuda + ((COSTO_INMEDIATO - caja) * INTERES)
                 estado["Caja disponible"] = 0.0
-                estado["Deuda pendiente"] = deuda + (COSTO_INMEDIATO * INTERES)
             
             # Una vez realizado el gasto (o la deuda) y completada la negociación, marcamos que el crédito ha sido concedido.
             # A partir de este punto, todas las compras de insumos deberán registrarse como compras a crédito, es decir,
