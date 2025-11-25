@@ -163,6 +163,8 @@ def rh_contratar_personal_permanente(estado):
     - Si se vuelve a ejecutar esta accion, se aumentan 4,000 mas en salarios y 1 mas en numero de empleados.
     - Se puede seguir aumentnto el personal infinitas veces.
     """
+    estado["Sueldos por pagar"] = estado["Sueldos por pagar"] + 4000
+    estado['Cantidad de empleados'] = estado['Cantidad de empleados'] + 1
     return estado
 
 def rh_contratar_personal_temporal(estado):
@@ -199,6 +201,21 @@ def rh_implementar_incentivos(estado):
     - Si no hay dinero, debes pedir un préstamo al 12% de interes
         • Es decir, implementas el incentivo, y te haces una deuda de S/ 5,600
     """
+    # vemos suficiente dinero en la caja para pagar a los empleados
+
+    # Se activa el contador
+    estado["ContadordeIncentivosActivos"] = 5
+
+    if estado["Caja disponible"] < 5000:
+        estado['Deuda pendiente'] += (10000 - estado['Caja disponible']) * 1.12
+        estado["Caja disponible"] = 0
+    else:
+        estado["Caja disponible"] = estado["Caja disponible"] - 5000
+
+    estado['IncentivosActivos'] = True
+    # Ahora vamos a calcular_estado_final
+
+    estado['Deuda pendiente'] = round(estado['Deuda pendiente'], 2)
     return estado
 
 def rh_medicion_clima(estado):
@@ -211,6 +228,13 @@ def rh_medicion_clima(estado):
     - También bloquea por 5 turnos  cartas del caos relacionadas a la fuga de talento.
     - En resumen, el buen clima laboral evita errores manuales por 5 turnos.
     """
+
+    # Bloquea por 5 turnos cartas del caos relacionadas con huelgas o bajo rendimiento de personal por 3 turnos.
+
+    # Carta 8 ->
+    estado['Bloqueodeclima'] = True
+    estado['ContadordeBloqueodeclima'] = 5
+
     return estado
 
 def rh_capacitar_seguridad(estado):
@@ -443,13 +467,13 @@ def compras_negociar_credito(estado: dict):
     #  - "CreditoConcedido"
     #  - "CuentasAPagarACredito"
 
-    # El método setdefault garantiza que estas claves existan; si ya existen, no altera su valor.
+    # El metodo setdefault garantiza que estas claves existan; si ya existen, no altera su valor.
     estado.setdefault("CreditoConcedido", False)
     estado.setdefault("CuentasAPagarACredito", [])
 
     # Verificamos si ya se concedió el crédito:
     #  - Si el flag es True, quiere decir que tiene un crédito activo; por lo tanto, no tiene sentido volver a hacerlo.
-    #  - Si el flag es False, quiere decir que no tiene un crédito activo; procede con todo el flujo interno del if.
+    #  - Si el flag es False, quiere decir que no tiene un crédito activo; procede contodo el flujo interno del if
      
     # Esto implementa el principio de IDEMPOTENCIA, es decir: hacer la misma acción
     # dos o más veces no producirá efectos adicionales después de la primera ejecución.

@@ -38,6 +38,10 @@ def calcular_estado_inicial():
         "EcommerceActivo":                   False,
         "InventarioMesAnterior":             0,
         'TurnoEmpleadostemporales':          0,
+        'IncentivosActivos':                 False,
+        'ContadordeIncentivosActivos':       0,
+        'Bloqueodeclima':                    False,
+        'ContadordeBloqueodeclima':          0,
         # Banadera de creditos activos
         "CreditoConcedido":                  False,
 
@@ -130,13 +134,29 @@ def calcular_estado_final(estado):
     # 5) Anular multas, accidentes, y demas cartas del caos
     estado["Prohibir Produccion"]   = estado["Prohibir Produccion"]
 
-    # 6) Produccion en automatico
-    estado["Inventario"]            = estado["Inventario"]
+    # 6) Produccion en automatico (modifico para rh_incentivos)
+    if estado['ContadordeIncentivosActivos'] == 0:
+        estado['IncentivosActivos'] = False
+
+    if estado['IncentivosActivos']: # Si incentivos activos esta en True
+        # El contador disminuye cada turno
+        estado['ContadordeIncentivosActivos'] = estado['ContadordeIncentivosActivos'] - 1
+        estado["Inventario"] = estado["Inventario"] * 1.2
+    else: # Falta modificar para quien lo use
+        estado["Inventario"] = estado["Inventario"]
 
     # 7) Actualizacion de flags temporales y decremento de contadores
     estado["TurnosProduccionExtra"] = estado["TurnosProduccionExtra"]
 
     # 8) Perdida de inventario:
     estado["Inventario"]            = estado["Inventario"]
+
+    # Carta 8 -> (modifico para rh_incentivos)
+    if estado['ContadordeBloqueodeclima'] == 0:
+        estado['Bloqueodeclima'] = False
+
+    if estado['Bloqueodeclima']: # Si bloqueodeclima esta en True
+        # El contador disminuye cada turno
+        estado['ContadordeBloqueodeclima'] = estado['ContadordeBloqueodeclima'] - 1
 
     return estado

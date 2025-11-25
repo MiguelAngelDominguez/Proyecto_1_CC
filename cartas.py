@@ -49,7 +49,21 @@ def aplicar_carta(numero, estado):
     #   - Pierdes 1 maquina activa (pasa a dañada).
     #   - Pierdes 1 empleado.
     elif numero == 8:
-        return estado
+        if estado['ContadordeBloqueodeclima'] == 0:
+            maquinas_str = estado["Maquinas (total/activas/dañadas)"]
+            partes = maquinas_str.split('/')
+            maquinas_activas = int(partes[1]) - 1
+            maquinas_daniadas = int(partes[2]) + 1
+            estado['Maquinas (total/activas/dañadas)'] = f'{int(partes[0])}/{maquinas_activas}/{maquinas_daniadas}'
+            estado['Cantidad de empleados'] = estado['Cantidad de empleados'] - 1
+            print('valio verga')
+            estado['Bloqueodeclima'] = False
+            return estado
+        elif estado['Bloqueodeclima']:
+            numero = 1
+            aplicar_carta(numero, estado)
+            print('todo normal')
+            return estado
 
     # Carta 9: Huelga por ambiente laboral
     #   - La proxima ronda no se produce.
