@@ -9,6 +9,18 @@ def aplicar_carta(numero, estado):
     # Carta 2: Falla critica en maquinaria:
     # Pierdes 2 maquinas activas permanentemente (hasta hacer mantenimiento)
     elif numero == 2:
+        maquinas_str = estado["Maquinas (total/activas/dañadas)"]
+        partes = maquinas_str.split('/')
+        if int(partes[1]) > 1:
+            maquinas_activas = int(partes[1]) - 2
+            maquinas_daniadas = int(partes[2]) + 2
+            estado['Maquinas (total/activas/dañadas)'] = f'{int(partes[0])}/{maquinas_activas}/{maquinas_daniadas}'
+        elif int(partes[1]) == 1:
+            maquinas_activas = int(partes[1]) - 1
+            maquinas_daniadas = int(partes[2]) + 1
+            estado['Maquinas (total/activas/dañadas)'] = f'{int(partes[0])}/{maquinas_activas}/{maquinas_daniadas}'
+        elif int(partes[1]) == 0:
+            estado['Maquinas (total/activas/dañadas)'] = maquinas_str
         return estado
 
     # Carta 3: Virus informatico:
