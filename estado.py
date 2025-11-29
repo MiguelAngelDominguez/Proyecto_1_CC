@@ -10,10 +10,10 @@ def calcular_estado_inicial():
     return {
         # Indicadores financieros y operativos
         "Caja disponible":                   50000,
-        "Inventario":                        0,
+        "Inventario":                        5000,
         "Pedidos por atender":               0,
         "Unidades vendidas":                 0,
-        "Insumos disponibles":               100,
+        "Insumos disponibles":               50000,
         "Cantidad de empleados":             empleados,
         "EmpleadosTemporales":               0,
         "Costo por empleado":                costo_emp,

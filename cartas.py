@@ -30,17 +30,29 @@ def aplicar_carta(numero, estado):
     # Los clientes se enteraron y bajo la reputacion 1 nivel
     # Duración: 2 turnos
     elif numero == 3:
+
+
+
+        partes = estado["Reputacion del mercado"].split(' ')
+        num = int(partes[1]) - 1
+        estado["Reputacion del mercado"] = f'Nivel {num}'
         return estado
 
     # Carta 4: Incendio en almacen
     #   - Se pierde el inventario total (al final del mes, despues de haber producido y vendido)
     elif numero == 4:
+        # zolo lo ponemoz en 0, porque primero zon laz accionez y luego la carta
+        estado["Inventario"] = 0
         return estado
 
     # Carta 5: Auditoria desfavorable
     #   - Aumentan las multas e indemnizaciones en +5000.
     # Los clientes se enteraron y bajo la reputacion 1 nivel
     elif numero == 5:
+        estado["Multas e indemnizaciones"] += 5000
+        partes = estado["Reputacion del mercado"].split(' ')
+        num = int(partes[1]) - 1
+        estado["Reputacion del mercado"] = f'Nivel {num}'
         return estado
 
     # Carta 6: Producto retirado del mercado
@@ -68,13 +80,11 @@ def aplicar_carta(numero, estado):
             maquinas_daniadas = int(partes[2]) + 1
             estado['Maquinas (total/activas/dañadas)'] = f'{int(partes[0])}/{maquinas_activas}/{maquinas_daniadas}'
             estado['Cantidad de empleados'] = estado['Cantidad de empleados'] - 1
-            print('valio verga')
             estado['Bloqueodeclima'] = False
             return estado
         elif estado['Bloqueodeclima']:
             numero = 1
             aplicar_carta(numero, estado)
-            print('todo normal')
             return estado
 
     # Carta 9: Huelga por ambiente laboral
