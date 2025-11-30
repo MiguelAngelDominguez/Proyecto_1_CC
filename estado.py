@@ -134,15 +134,15 @@ def calcular_estado_final(estado):
     precio_venta = 4.5
     pedidos = estado["Pedidos por atender"]
     inventario = estado["Inventario"]
-    # Lo que se podría vender en este turno
+    #
     ventas = min(pedidos, inventario)
-    # Verifica contador
+    # Aplicar boicot, verifica contador
     if estado["TurnosBoicot"] > 0:
         ventas = int(ventas*estado["ReductorBoicot"])
         estado["TurnosBoicot"] -= 1
-    # Si el boicot ya terminó restaurar reductor
-    if estado["TurnosBoicot"] == 0:
-        estado["ReductorBoicot"] = 1.0
+        # Si el boicot ya terminó restaurar reductor
+        if estado["TurnosBoicot"] == 0:
+            estado["ReductorBoicot"] = 1.0
     # Asegurar que no se venda más inventario del disponible
     ventas = min(ventas, inventario)
     # Actualizar estado
@@ -181,6 +181,7 @@ def calcular_estado_final(estado):
     # ============================
     # 6) Produccion en automatico (modifico para rh_incentivos)
     # ============================
+    ## Carta
     if estado['ContadordeIncentivosActivos'] == 0:
         estado['IncentivosActivos'] = False
 
@@ -190,6 +191,28 @@ def calcular_estado_final(estado):
         estado["Inventario"] = estado["Inventario"] * 1.2
     else: # Falta modificar para quien lo use
         estado["Inventario"] = estado["Inventario"]
+
+    ## Carta 9: Huelga por ambiente laboral
+    # Si hay huelga, no se produce nada
+    # No producir nada automáticamente
+    # No aplicar TurnosProduccionExtra
+    # No aplicar incentivos
+    # No se gasta insumos
+    # No se modifica Inventario
+    if estado["Prohibir Produccion"]:
+        pass
+    else:
+        if estado["TurnosProduccionExtra"] > 0:
+            # Se produce lo mismo que en el mes anterior
+            inventario_extra = estado["InventarioMesAnterior"]
+            maquinas_str = estado["Maquinas (total/activas/dañadas)"]
+            partes = maquinas_str.split('/')
+            maquinas_activas = int(partes[1])
+            # 2000 unidades por máquina (sin gastar insumos)
+            produccion_automatica = maquinas_activas * 2000
+            # Actualizar inventario
+            estado["Inventario"] += produccion_automatica
+
 
     # ============================
     # 7) Actualizacion de flags temporales y decremento de contadores
@@ -204,6 +227,14 @@ def calcular_estado_final(estado):
     if estado["TurnosBloqueoDemanda"] > 0:
         estado["TurnosBloqueoDemanda"] -= 1
     # FALTAAAAA
+
+    ## Carta 9: Huelga por ambiente laboral
+    # TurnosProhibidos (huelga u otros bloqueos)
+    if estado["TurnosProhibidos"] > 0:
+        estado["TurnosProhibidos"] -= 1
+        # Si se acaban los turnos, liberar la prohibición
+        if estado["TurnosProhibidos"] == 0:
+            estado["Prohibir Produccion"] = False
 
 
     # ============================

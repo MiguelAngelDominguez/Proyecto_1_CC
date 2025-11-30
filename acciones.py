@@ -23,11 +23,11 @@ def produccion_producir(estado):
            • Esto se debe a que el proceso productivo tiene diferentes fases
        - Si no hay suficientes insumos no se puede producir.
        """
-    
-    # Verificar prohibicion 
+
+    # Verificar prohibicion
     # Si la producción está prohibida, se cuenta el turno prohibido y la función termina.
     if estado["Prohibir Produccion"]:
-        estado["TurnosProhibidos"] += 1
+        #estado["TurnosProhibidos"] += 1
         return estado
 
     # Si no hay prohibición, se resetea el contador.
