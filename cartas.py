@@ -262,6 +262,12 @@ def aplicar_carta(numero, estado):
     # Carta 32: Error contable
     #   - Caja −7000.
     elif numero == 32:
+        if estado["Caja disponible"] < 7000:
+            deuda = (7000 - estado["Caja disponible"])
+            estado["Deuda pendiente"] += deuda
+            estado["Caja disponible"] = 0
+        else:
+            estado["Caja disponible"] -= 7000
         return estado
 
     # Carta 33: Error en codigo de barras
