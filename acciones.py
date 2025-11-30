@@ -286,6 +286,47 @@ def marketing_lanzar_campania(estado):
     - Si no hay dinero, debes pedir un préstamo al 12% de interes
         • Es decir, lanzas la campaña, y te haces una deuda de S/ 8,960
     """
+    costo_campaña = 8000
+    interes = 0.12
+
+    # Pago o deuda de la campaña
+    if estado["Caja Disponible"] < costo_campaña:
+        deuda = (costo_campaña - estado["Caja Disponible"]) * (1 + interes)
+        estado["Deuda Pendiente"] += deuda
+        estado["Caja disponible"] = 0
+    else:
+        estado["Caja disponible"] -= costo_campaña
+
+    # Reputación
+    nivel = int(estado["Reputacion del mercado"].split()[-1])
+    if nivel < 7:
+        estado["Reputacion del mercado"] = "Nivel 7"
+
+    # Demanda Extra (2 turnos)
+    # Se añade hoy y el flag continúa el siguiente turno
+    estado["DemandaExtraTemporal"] += 4000
+    estado["TurnosDemandaExtra"] = 2
+
+    # Ventas +20% (2 turnos)
+    if estado["Inventario"] > 0:
+        estado["MultiplicadorVentas"] = 1.20
+        estado["TurnosVentasExtra"] = 2
+    else:
+        estado["MultiplicadorVentas"] = 1.0
+        estado["TurnosVentasExtra"] = 0
+
+    # Bloquear cartas (5 turnos)
+    estado["TurnosBloqueoDemanda"] = 5
+
+    """
+    FALTA............
+    - Añade “DemandaExtraTemporal” de +4000 unidades para el turno actual y el siguiente.
+    - Aumenta nuestras ventas en 20% por dos turnos
+    - Bloquea por 5 turnos
+    """
+
+    "Carta 6" "Carta 19" "Carta 33, 34, 35, 36, 3, 9, 10, 11, 17, 20, 23, 29"
+
     return estado
 
 def marketing_invertir_branding(estado):
@@ -374,6 +415,7 @@ def marketing_co_branding(estado):
         estado["TurnosVentasExtra"] += 2
         estado["MultiplicadorVentas"] = 1.20
     else:
+        estado["TurnosVentasExtra"] = 0
         estado["MultiplicadorVentas"] = 1.0
 
     return estado

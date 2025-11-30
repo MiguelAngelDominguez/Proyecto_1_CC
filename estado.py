@@ -17,7 +17,7 @@ def calcular_estado_inicial():
         "Cantidad de empleados":             empleados,
         "EmpleadosTemporales":               0,
         "Costo por empleado":                costo_emp,
-        "Sueldos por pagar":                 empleados * costo_emp,
+        "Sueldos por pagar ":                 empleados * costo_emp,
         "Deuda pendiente":                   20000,
         "Reputacion del mercado":            "Nivel 3",
         "Multas e indemnizaciones":          0,
@@ -48,6 +48,8 @@ def calcular_estado_inicial():
         # Contador de Turnos de prohibicion
         "TurnosProhibidos":                  0,
 
+        "TurnosDemandaExtra":                0,
+        "TurnosBloqueoDemanda":              0,
         "TurnosVentasExtra":                 0,
         "DemandaExtraProximoMes":            0,
         "MultiplicadorVentas":               0
@@ -148,10 +150,22 @@ def calcular_estado_final(estado):
     # 7) Actualizacion de flags temporales y decremento de contadores
     estado["TurnosProduccionExtra"] = estado["TurnosProduccionExtra"]
 
+    # Ventas extra por campaña
+    if estado["TurnosVentasExtra"] > 0:
+        estado["TurnosVentasExtra"] -= 1
+        if estado["TurnosVentasExtra"] == 0:
+            estado["MultiplicadorVentas"] = 1.0
+
+    # Bloqueo de campañas - cartas
+    if estado["TurnosBloqueoDemanda"] > 0:
+        estado["TurnosBloqueoDemanda"] -= 1
+    # FALTAAAAA
+
+
     # 8) Perdida de inventario:
     estado["Inventario"]            = estado["Inventario"]
 
-    # Carta 8 -> (modifico para rh_incentivos)
+    ## Carta 8 -> (modifico para rh_incentivos)
     if estado['ContadordeBloqueodeclima'] == 0:
         estado['Bloqueodeclima'] = False
 
