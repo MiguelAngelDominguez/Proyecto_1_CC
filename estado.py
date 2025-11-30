@@ -135,13 +135,13 @@ def calcular_estado_final(estado):
     ventas = min(pedidos, inventario)
     # Verifica contador
     if estado["TurnosBoicot"] > 0:
-        ventas *= estado["ReductorBoicot"]
+        ventas = int(ventas*estado["ReductorBoicot"])
         estado["TurnosBoicot"] -= 1
-    else:
-        estado["TurnosBoicot"] == 0
+    # Si el boicot ya terminó restaurar reductor
+    if estado["TurnosBoicot"] == 0:
         estado["ReductorBoicot"] = 1.0
 
-    # Asegurar que no se venda mas que el inventario
+    # Asegurar que no se venda más inventario del disponible
     ventas = min(ventas, inventario)
 
     # Actualizar estado

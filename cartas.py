@@ -233,8 +233,8 @@ def aplicar_carta(numero, estado):
     #   - Ventas −40%:
     #   - Debemos pagar 5,000 por almacén
     # Duración: 3 turnos
-
     elif numero == 26:
+        estado["Turnos"]
         return estado
 
     # Carta 27: Robo interno
