@@ -61,6 +61,10 @@ def aplicar_carta(numero, estado):
     #   - Luego, la demanda actual se reduce en 50%
     # Duración: 2 turnos
     elif numero == 6:
+        #
+        nivel = int(estado["Reputacion del mercado"].split()[-1])
+        estado["Reputacion del mercado"] = f"Nivel {max(0, nivel - 2)}"
+        estado["ReductorDemanda"] = 0.5
         return estado
 
     # Carta 7: Robo de insumos
@@ -97,6 +101,12 @@ def aplicar_carta(numero, estado):
     #   - Los clientes se enteran de la huelga y baja la reputación 3 niveles
     # Duración: 2 turnos
     elif numero == 9:
+        # Bajar reputacion 3 niveles
+        nivel = int(estado["Reputacion del mercado"].split()[-1])
+        estado["Reputacion del mercado"] = f"Nivel {max(0, nivel - 3)}"
+        #estado["Prohibir Produccion"]
+        # Activar bloqueo de producción por 2 turnos
+        estado["TurnosProhibidos"] = 2
         return estado
 
     # Carta 10: Hacker secuestra datos

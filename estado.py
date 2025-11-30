@@ -122,7 +122,10 @@ def calcular_estado_final(estado):
          entonces, el excedente caduca (hasta completar el 10% que vence).
        - Puedes apoyarte de las variables "InventarioMesAnterior" e "Inventario"
     """
+
+    # ============================
     # 1) Venta automatica
+    # ============================
     estado["Inventario"]            = estado["Inventario"]
     estado["Unidades vendidas"]     = estado["Unidades vendidas"]
     estado["Caja disponible"]       = estado["Caja disponible"]
@@ -140,10 +143,8 @@ def calcular_estado_final(estado):
     # Si el boicot ya terminó restaurar reductor
     if estado["TurnosBoicot"] == 0:
         estado["ReductorBoicot"] = 1.0
-
     # Asegurar que no se venda más inventario del disponible
     ventas = min(ventas, inventario)
-
     # Actualizar estado
     estado["Inventario"] -= ventas
     estado["Unidades vendidas"] += ventas
@@ -151,21 +152,35 @@ def calcular_estado_final(estado):
     estado["Pedidos por atender"] -= ventas
 
 
+    # ============================
     # 2) Actualizacion de pedidos por atender
+    # ============================
     estado["Pedidos por atender"]   = estado["Pedidos por atender"]
     estado["Reputacion del mercado"] = estado["Reputacion del mercado"]
 
+
+    # ============================
     # 3) Pago de la nomina del mes actual
+    # ============================
     estado["Sueldos por pagar"]     = estado["Sueldos por pagar"]
     estado["Caja disponible"]       = estado["Caja disponible"]
 
+
+    # ============================
     # 4) Generacion de la nomina del proximo mes
+    # ============================
     estado["Sueldos por pagar"]     = estado["Sueldos por pagar"]
 
+
+    # ============================
     # 5) Anular multas, accidentes, y demas cartas del caos
+    # ============================
     estado["Prohibir Produccion"]   = estado["Prohibir Produccion"]
 
+
+    # ============================
     # 6) Produccion en automatico (modifico para rh_incentivos)
+    # ============================
     if estado['ContadordeIncentivosActivos'] == 0:
         estado['IncentivosActivos'] = False
 
@@ -176,22 +191,24 @@ def calcular_estado_final(estado):
     else: # Falta modificar para quien lo use
         estado["Inventario"] = estado["Inventario"]
 
+    # ============================
     # 7) Actualizacion de flags temporales y decremento de contadores
+    # ============================
     estado["TurnosProduccionExtra"] = estado["TurnosProduccionExtra"]
-
     # Ventas extra por campaña
     if estado["TurnosVentasExtra"] > 0:
         estado["TurnosVentasExtra"] -= 1
         if estado["TurnosVentasExtra"] == 0:
             estado["MultiplicadorVentas"] = 1.0
-
     # Bloqueo de campañas - cartas
     if estado["TurnosBloqueoDemanda"] > 0:
         estado["TurnosBloqueoDemanda"] -= 1
     # FALTAAAAA
 
 
+    # ============================
     # 8) Perdida de inventario:
+    # ============================
     estado["Inventario"]            = estado["Inventario"]
 
     ## Carta 8 -> (modifico para rh_incentivos)
