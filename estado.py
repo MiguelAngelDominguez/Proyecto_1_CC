@@ -37,9 +37,11 @@ def calcular_estado_inicial():
         "MantenimientoHecho":                False,
         "EcommerceActivo":                   False,
         "InventarioMesAnterior":             0,
+
         'TurnoEmpleadostemporales':          0,
         'IncentivosActivos':                 False,
         'ContadordeIncentivosActivos':       0,
+
         'Bloqueodeclima':                    False,
         'ContadordeBloqueodeclima':          0,
         # Banadera de creditos activos
@@ -48,11 +50,14 @@ def calcular_estado_inicial():
         # Contador de Turnos de prohibicion
         "TurnosProhibidos":                  0,
 
-        "TurnosDemandaExtra":                0,
-        "TurnosBloqueoDemanda":              0,
+        #"TurnosDemandaExtra":                0,
+        #"TurnosBloqueoDemanda":              0,
         "TurnosVentasExtra":                 0,
         "DemandaExtraProximoMes":            0,
-        "MultiplicadorVentas":               0
+        "MultiplicadorVentas":               0,
+        # Carta 12
+        "TurnosBoicot":                      0,
+        "ReductorBoicot":                    1.0
     }
 
 def calcular_estado_final(estado):
@@ -121,6 +126,30 @@ def calcular_estado_final(estado):
     estado["Inventario"]            = estado["Inventario"]
     estado["Unidades vendidas"]     = estado["Unidades vendidas"]
     estado["Caja disponible"]       = estado["Caja disponible"]
+
+    ## Carta 12: Boicot de clientes
+    precio_venta = 4.5
+    pedidos = estado["Pedidos por atender"]
+    inventario = estado["Inventario"]
+    # Lo que se podría vender en este turno
+    ventas = min(pedidos, inventario)
+    # Verifica contador
+    if estado["TurnosBoicot"] > 0:
+        ventas *= estado["ReductorBoicot"]
+        estado["TurnosBoicot"] -= 1
+    else:
+        estado["TurnosBoicot"] == 0
+        estado["ReductorBoicot"] = 1.0
+
+    # Asegurar que no se venda mas que el inventario
+    ventas = min(ventas, inventario)
+
+    # Actualizar estado
+    estado["Inventario"] -= ventas
+    estado["Unidades vendidas"] += ventas
+    estado["Caja disponible"] += ventas * precio_venta
+    estado["Pedidos por atender"] -= ventas
+
 
     # 2) Actualizacion de pedidos por atender
     estado["Pedidos por atender"]   = estado["Pedidos por atender"]
