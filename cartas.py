@@ -158,7 +158,12 @@ def aplicar_carta(numero, estado):
     # Carta 16: Estafa financiera
     #   - Pierdes 8,000 de caja
     elif numero == 16:
-        estado["Caja disponible"] -= 8000
+        if estado["Caja disponible"] < 8000:
+            deuda = (8000 - estado["Caja disponible"])
+            estado["Deuda pendiente"] += deuda
+            estado["Caja disponible"] = 0
+        else:
+            estado["Caja disponible"] -= 8000
         return estado
 
     # Carta 17: Rumor de corrupcion
@@ -236,6 +241,7 @@ def aplicar_carta(numero, estado):
         if estado["Caja disponible"] < 10000:
             deuda = (10000 - estado["Caja disponible"])
             estado["Deuda pendiente"] += deuda
+            estado["Caja disponible"] = 0
         else:
             estado["Caja disponible"] -= 10000
         return estado
