@@ -163,6 +163,8 @@ def rh_contratar_personal_permanente(estado):
     - Si se vuelve a ejecutar esta accion, se aumentan 4,000 mas en salarios y 1 mas en numero de empleados.
     - Se puede seguir aumentnto el personal infinitas veces.
     """
+    estado["Sueldos por pagar"] = estado["Sueldos por pagar"] + 4000
+    estado['Cantidad de empleados'] = estado['Cantidad de empleados'] + 1
     return estado
 
 def rh_contratar_personal_temporal(estado):
@@ -172,27 +174,21 @@ def rh_contratar_personal_temporal(estado):
     - Si no hay suficiente dinero, se financia la diferencia con un préstamo al 12% (prorrateado).
     - Registra el número de empleados temporales y los turnos que quedan.
     """
-    costo_contratacion = 10000     # Pago único por outsourcing
-    empleados_temporales = 4       # Empleados adicionales este turno
-    interes = 0.12                 # Interés del préstamo
-
-    # Verificar si hay dinero suficiente
-    if estado["Caja disponible"] >= costo_contratacion:
-        # Si hay suficiente dinero, solo descontamos el pago
-        estado["Caja disponible"] -= costo_contratacion
+    # vemos suficiente dinero en la caja para pagar a los empleados
+    if estado['Caja disponible'] < 10000:
+        # si es menor entonces hacemos un prestamo con el 12% de interes (ojo que pedimos prestado lo que nos falta para contratar)
+        estado['Deuda pendiente'] += (10000 - estado['Caja disponible']) * 1.12
+        # ponemos a la caja a 0
+        estado['Caja disponible'] = 0
     else:
-        # Verificamos si hay suficiente dinero en caja
-        # Calculamos cuánto falta y aplicamos el 12% de interés total
-        deuda = costo_contratacion * (1 + interes)  # 10,000 + 12% = 11,200
-        estado["Deuda pendiente"] += deuda
-        estado["Caja disponible"] = 0   # Caja queda vacía
-
-    # Aplicar empleados temporales
-    estado["EmpleadosTemporales"] = empleados_temporales
-
+        # sino, solo le restamos 10000
+        estado['Caja disponible'] = estado['Caja disponible'] - 10000
+    # ahora redondeamos la deuda pendiente a 2 para mas orden visual
+    estado['Deuda pendiente'] = round(estado['Deuda pendiente'], 2)
+    # establecemos cuantos empleados contratamos
+    estado['Empleados Temporales'] = 4
     # Registrar que estos empleados duran solo este turno
     estado["TurnoEmpleadostemporales"] = 1
-
     return estado
 
 
@@ -205,6 +201,21 @@ def rh_implementar_incentivos(estado):
     - Si no hay dinero, debes pedir un préstamo al 12% de interes
         • Es decir, implementas el incentivo, y te haces una deuda de S/ 5,600
     """
+    # vemos suficiente dinero en la caja para pagar a los empleados
+
+    # Se activa el contador
+    estado["ContadordeIncentivosActivos"] = 5
+
+    if estado["Caja disponible"] < 5000:
+        estado['Deuda pendiente'] += (10000 - estado['Caja disponible']) * 1.12
+        estado["Caja disponible"] = 0
+    else:
+        estado["Caja disponible"] = estado["Caja disponible"] - 5000
+
+    estado['IncentivosActivos'] = True
+    # Ahora vamos a calcular_estado_final
+
+    estado['Deuda pendiente'] = round(estado['Deuda pendiente'], 2)
     return estado
 
 def rh_medicion_clima(estado):
@@ -217,6 +228,13 @@ def rh_medicion_clima(estado):
     - También bloquea por 5 turnos  cartas del caos relacionadas a la fuga de talento.
     - En resumen, el buen clima laboral evita errores manuales por 5 turnos.
     """
+
+    # Bloquea por 5 turnos cartas del caos relacionadas con huelgas o bajo rendimiento de personal por 3 turnos.
+
+    # Carta 8 ->
+    estado['Bloqueodeclima'] = True
+    estado['ContadordeBloqueodeclima'] = 5
+
     return estado
 
 def rh_capacitar_seguridad(estado):
@@ -355,8 +373,11 @@ def marketing_co_branding(estado):
     if estado["Inventario"] > 0:
         estado["TurnosVentasExtra"] += 2
         estado["MultiplicadorVentas"] = 1.20
+    else:
+        estado["MultiplicadorVentas"] = 1.0
 
     return estado
+
 
 
 def marketing_no_hacer_nada(estado):
@@ -446,13 +467,13 @@ def compras_negociar_credito(estado: dict):
     #  - "CreditoConcedido"
     #  - "CuentasAPagarACredito"
 
-    # El método setdefault garantiza que estas claves existan; si ya existen, no altera su valor.
+    # El metodo setdefault garantiza que estas claves existan; si ya existen, no altera su valor.
     estado.setdefault("CreditoConcedido", False)
     estado.setdefault("CuentasAPagarACredito", [])
 
     # Verificamos si ya se concedió el crédito:
     #  - Si el flag es True, quiere decir que tiene un crédito activo; por lo tanto, no tiene sentido volver a hacerlo.
-    #  - Si el flag es False, quiere decir que no tiene un crédito activo; procede con todo el flujo interno del if.
+    #  - Si el flag es False, quiere decir que no tiene un crédito activo; procede contodo el flujo interno del if
      
     # Esto implementa el principio de IDEMPOTENCIA, es decir: hacer la misma acción
     # dos o más veces no producirá efectos adicionales después de la primera ejecución.
@@ -485,8 +506,8 @@ def compras_negociar_credito(estado: dict):
                 #
                 #      Esto modela una situación financiera real: la empresa avanza con la negociación,
                 #      pero lo hace a costa de endeudarse.
+                estado["Deuda pendiente"] = deuda + ((COSTO_INMEDIATO - caja) * INTERES)
                 estado["Caja disponible"] = 0.0
-                estado["Deuda pendiente"] = deuda + (COSTO_INMEDIATO * INTERES)
             
             # Una vez realizado el gasto (o la deuda) y completada la negociación, marcamos que el crédito ha sido concedido.
             # A partir de este punto, todas las compras de insumos deberán registrarse como compras a crédito, es decir,
