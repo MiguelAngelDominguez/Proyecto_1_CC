@@ -179,7 +179,7 @@ def calcular_estado_final(estado):
 
 
     # ============================
-    # 6) Produccion en automatico (modifico para rh_incentivos)
+    # 6) Produccion en automatico
     # ============================
     ## Carta
     if estado['ContadordeIncentivosActivos'] == 0:
@@ -204,7 +204,6 @@ def calcular_estado_final(estado):
     else:
         if estado["TurnosProduccionExtra"] > 0:
             # Se produce lo mismo que en el mes anterior
-            inventario_extra = estado["InventarioMesAnterior"]
             maquinas_str = estado["Maquinas (total/activas/dañadas)"]
             partes = maquinas_str.split('/')
             maquinas_activas = int(partes[1])
