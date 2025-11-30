@@ -66,6 +66,11 @@ def aplicar_carta(numero, estado):
     # Carta 7: Robo de insumos
     #   - Pierdes 30% de insumos disponibles.
     elif numero == 7:
+        perdida = 0.3
+        if estado["Insumos disponibles"] > 0:
+            estado["Insumos disponibles"] = max(0, estado["Insumos disponibles"]*(1-perdida))
+        else:
+            estado["Insumos disponibles"] = 0
         return estado
 
     # Carta 8: Fuga de talento clave
