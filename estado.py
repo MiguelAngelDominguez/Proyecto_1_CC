@@ -207,7 +207,7 @@ def calcular_estado_final(estado):
     estado["Reputacion del mercado"] = estado["Reputacion del mercado"]
     # Obtener nivel de reputación
 
-
+    
     # ============================
     # 3) Pago de la nomina del mes actual
     # ============================
@@ -226,11 +226,12 @@ def calcular_estado_final(estado):
     # 4) Generacion de la nomina del proximo mes
     # ============================
 
-
+    estado["Sueldos por pagar"] = estado["Cantidad de empleados"] * estado["Costo por empleado"]
 
     # ============================
     # 5) Anular multas, accidentes, y demas cartas del caos
     # ============================
+
     estado["Prohibir Produccion"]   = estado["Prohibir Produccion"]
 
 
@@ -275,7 +276,12 @@ def calcular_estado_final(estado):
     # Bloqueo de campañas - cartas
     if estado["TurnosBloqueoDemanda"] > 0:
         estado["TurnosBloqueoDemanda"] -= 1
-    # FALTAAAAA
+        
+    # FALTAAAA
+
+    #  Carta 3:
+    if estado["TurnosBloqueoVentasCarta3"] > 0 :
+        estado["TurnosBloqueoVentasCarta3"] -= 1
 
     ## Carta 6:
     if estado["TurnosDemandaReducida"] > 0:
@@ -295,13 +301,16 @@ def calcular_estado_final(estado):
         estado["TurnosBoicot"] -= 1
         if estado["TurnosBoicot"] == 0:
             estado["TurnosBoicot"] = 0
+    
+    # Cartas 13
+    if estado["TurnoErrorEtiqueta"] > 0:
+        estado["TurnoErrorEtiqueta"] -= 1
 
     # Carta 3
     if estado['Carta 3']:
         estado['Inventario'] = estado["Inventario"] - estado['AlmacenDeLoProducidoAnteiormente']
         estado["Insumos disponibles"] += 40000
         estado['Carta 3'] = False
-
 
     # Carta 15: Prohibir compras nacionales
     if estado["TurnosProhibicionComprasNacionales"] > 0:
@@ -313,15 +322,31 @@ def calcular_estado_final(estado):
     if estado["TurnosPlaga"] > 0:
         estado["TurnosPlaga"] -= 1
 
+    # Carta 21
+    if estado["TurnosProhibirProduccion"] > 0:
+        estado["TurnosProhibirProduccion"] -= 1
+
     # Carta 24: Bloqueo logístico
     if estado["TurnosBloqueoVentas"] > 0:
         estado["TurnosBloqueoVentas"] -= 1
+    
+    # Carta 26
+    if estado["TurnoCompetidorAgresivo"] > 0:
+        estado["TurnoCompetidorAgresivo"] -= 1
 
     # Carta 28: Crisis economica
     if estado["TurnosCostos"] > 0:
         estado["TurnosCostos"] -= 1
         if estado["TurnosCostos"] == 0:
             estado["Sueldos por pagar"] = estado["Cantidad de empleados"] * estado["Costo por empleado"]
+
+    # Cartas 30
+    if estado["TurnosHuelga"] > 0:
+        estado["TurnosHuelga"] -= 1
+
+    # Carta 34
+    if estado["TurnoMalDiseñoEmpaque"] > 0:
+        estado["TurnoMalDiseñoEmpaque"] -= 1
 
     # Carta 37: Accidente
     if estado["TurnosAccidente"] > 0:

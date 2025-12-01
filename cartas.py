@@ -212,7 +212,6 @@ def aplicar_carta(numero, estado):
     # Duración: 3 turnos
     elif numero == 18:
         estado["TurnosPlaga"] = 3
-
         return estado
 
     # Carta 19: Cliente corporativo VIP cancela pedido
