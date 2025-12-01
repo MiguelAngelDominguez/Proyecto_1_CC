@@ -17,7 +17,7 @@ def calcular_estado_inicial():
         "Cantidad de empleados":             empleados,
         "EmpleadosTemporales":               0,
         "Costo por empleado":                costo_emp,
-        "Sueldos por pagar ":                 empleados * costo_emp,
+        "Sueldos por pagar":                 empleados * costo_emp,
         "Deuda pendiente":                   20000,
         "Reputacion del mercado":            "Nivel 3",
         "Multas e indemnizaciones":          0,
@@ -48,7 +48,7 @@ def calcular_estado_inicial():
         # Banadera de creditos activos
         "CreditoConcedido":                  False,
 
-        # Carta 9
+        # Carta 9 y Carta 22
         "TurnosProhibirProduccion":          0,
 
         #"TurnosDemandaExtra":                0,
@@ -57,7 +57,6 @@ def calcular_estado_inicial():
         "DemandaExtraProximoMes":            0,
         "MultiplicadorVentas":               0,
         # Carta 6
-        "ReductorDemanda":                   1.0,
         "TurnosDemandaReducida":             0,
         # Carta 12
         "TurnosBoicot":                      0,
@@ -71,12 +70,18 @@ def calcular_estado_inicial():
         #carta 14:
         "TurnosImportaciones":               0,
         #carta 24:
-        "TurnosBloqueoVentas":                0,
+        "TurnosBloqueoVentas":               0,
+        #carta 28:
+        "TurnosCostos":                      0,
         #carta 15:
         "TurnosProhibicionComprasNacionales":  0,
+        # Carta 26:
+        "TurnoCompetidorAgresivo":             0,
+        # Carta 34:
+        "TurnoMalDiseñoEmpaque":               0,
         #de acciones
-        "Coeficiente de produccion":           0,
-        "TurnosMantenimiento": 0
+        "Coeficiente de produccion":         0,
+        "TurnosMantenimiento":               0
     }
 
 
@@ -266,14 +271,9 @@ def calcular_estado_final(estado):
         estado["TurnosBoicot"] -= 1
         if estado["TurnosBoicot"] == 0:
             estado["TurnosBoicot"] = 0
-    else:
-        estado["TurnosBoicot"] = 0
 
-    # Carta 14: Prohibir importaciones
-    if estado["TurnosImportaciones"] > 0:
-        estado["TurnosImportaciones"] -= 1
-        if estado["TurnosImportaciones"] == 0:
-            estado["Prohibir Importaciones"] = False
+
+
 
     # Carta 15: Prohibir compras nacionales
     if estado["TurnosProhibicionComprasNacionales"] > 0:
@@ -288,6 +288,12 @@ def calcular_estado_final(estado):
     # Carta 24: Bloqueo logístico
     if estado["TurnosBloqueoVentas"] > 0:
         estado["TurnosBloqueoVentas"] -= 1
+
+    # Carta 28: Crisis economica
+    if estado["TurnosCostos"] > 0:
+        estado["TurnosCostos"] -= 1
+        if estado["TurnosCostos"] == 0:
+            estado["Sueldos por pagar"] = estado["Cantidad de empleados"] * estado["Costo por empleado"]
 
     # Carta 37: Accidente
     if estado["TurnosAccidente"] > 0:
@@ -311,5 +317,21 @@ def calcular_estado_final(estado):
     if estado['Bloqueodeclima']: # Si bloqueodeclima esta en True
         # El contador disminuye cada turno
         estado['ContadordeBloqueodeclima'] = estado['ContadordeBloqueodeclima'] - 1
+
+
+    #==============================================================
+    # Poner bien la reputacion del mercado, por si esta en negativo
+    #==============================================================
+    if estado["Reputacion del mercado"].split(' ')[1] < 0:
+        estado["Reputacion del mercado"] = f'Nivel 0'
+
+
+    # TODO SOBRE LOS TURNOS PONGANLOS AL FINAL
+    # Carta 14: Prohibir importaciones
+    if estado["TurnosImportaciones"] > 0:
+        estado["TurnosImportaciones"] -= 1
+        if estado["TurnosImportaciones"] == 0:
+            estado["Prohibir Importaciones"] = False
+
 
     return estado
