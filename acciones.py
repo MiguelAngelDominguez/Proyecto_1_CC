@@ -55,8 +55,9 @@ def produccion_producir(estado):
     if empleados_extra > 0:
         produccion = produccion * (1 + empleados_extra * 0.10)
 
-    #Si en caso se ejecuta la accion mejorar proceso, por cada turno aplicaremos un 5% de eficiciencia:
-    produccion = produccion * (1 + estado["Coeficiente de produccion"])
+    if estado["MejoraProceso"]:
+        #Si en caso se ejecuta la accion mejorar proceso, por cada turno aplicaremos un 5% de eficiciencia:
+        produccion = produccion * (1 + estado["Coeficiente de produccion"])
     #carta 18:
     if estado["TurnosPlaga"] > 0:
         produccion = produccion * 0.5
@@ -106,6 +107,7 @@ def produccion_mejorar_proceso(estado):
     - Esta mejora la hacen los ingneieros de la empresa, por lo que no genera desembolso de la caja.
     """
     estado["Coeficiente de produccion"]+=0.05
+    estado["MejoraProceso"]=True
 
     return estado
 
@@ -318,8 +320,8 @@ def marketing_lanzar_campania(estado):
     interes = 0.12
 
     # Pago o deuda de la campaña
-    if estado["Caja Disponible"] < costo_campaña:
-        deuda = (costo_campaña - estado["Caja Disponible"]) * (1 + interes)
+    if estado["Caja disponible"] < costo_campaña:
+        deuda = (costo_campaña - estado["Caja disponible"]) * (1 + interes)
         estado["Deuda Pendiente"] += deuda
         estado["Caja disponible"] = 0
     else:
