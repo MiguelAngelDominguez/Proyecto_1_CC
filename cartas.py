@@ -415,6 +415,7 @@ def aplicar_carta(numero, estado):
     #   Todos los empleados se quedaron en su casa por un mes
     #   No se vende ni se produce
     elif numero == 39:
+
         return estado
 
     # Carta 40: Hiring Freeze
