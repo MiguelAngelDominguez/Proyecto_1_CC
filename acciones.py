@@ -64,6 +64,8 @@ def produccion_producir(estado):
     if estado["TurnosAccidente"] > 0:
         produccion *= 0.5
 
+    # Almacenamos lo anterior
+    estado['AlmacenDeLoProducidoAnteiormente'] = produccion
     #modificamos el estado:
     estado["Inventario"] += produccion
     estado["TurnosProduccionExtra"] += 2

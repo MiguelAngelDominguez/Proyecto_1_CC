@@ -44,6 +44,7 @@ def calcular_estado_inicial():
 
         'Bloqueodeclima':                    False,
         'ContadordeBloqueodeclima':          0,
+        "TurnosBloqueoDemanda":              0,
         # Banadera de creditos activos
         "CreditoConcedido":                  False,
 
@@ -55,6 +56,11 @@ def calcular_estado_inicial():
         "TurnosVentasExtra":                 0,
         "DemandaExtraProximoMes":            0,
         "MultiplicadorVentas":               0,
+        # Carta 3
+        'AlmacenDeLoProducidoAnteiormente':  0,
+        'Carta 3':                         False,
+        # Carta 4
+        'Incendio':                        False,
         # Carta 6
         "TurnosDemandaReducida":             0,
         # Carta 12
@@ -271,7 +277,11 @@ def calcular_estado_final(estado):
         if estado["TurnosBoicot"] == 0:
             estado["TurnosBoicot"] = 0
 
-
+    # Carta 3
+    if estado['Carta 3']:
+        estado['Inventario'] = estado["Inventario"] - estado['AlmacenDeLoProducidoAnteiormente']
+        estado["Insumos disponibles"] += 40000
+        estado['Carta 3'] = False
 
 
     # Carta 15: Prohibir compras nacionales
@@ -321,11 +331,13 @@ def calcular_estado_final(estado):
     #==============================================================
     # Poner bien la reputacion del mercado, por si esta en negativo
     #==============================================================
-    if estado["Reputacion del mercado"].split(' ')[1] < 0:
+    if int(estado["Reputacion del mercado"].split(' ')[1]) < 0:
         estado["Reputacion del mercado"] = f'Nivel 0'
 
+    if estado['Incendio']:
+        estado["Inventario"] = 0
 
-    # TODO SOBRE LOS TURNOS PONGANLOS AL FINAL
+        # TODO SOBRE LOS TURNOS PONGANLOS AL FINAL
     # Carta 14: Prohibir importaciones
     if estado["TurnosImportaciones"] > 0:
         estado["TurnosImportaciones"] -= 1
