@@ -77,6 +77,8 @@ def calcular_estado_inicial():
         "TurnosImportaciones":               0,
         #carta 24:
         "TurnosBloqueoVentas":               0,
+        #carta 3:
+        "TurnosBloqueoVentasCarta3":         0,
         #carta 28:
         "TurnosCostos":                      0,
         #carta 15:
@@ -166,11 +168,15 @@ def calcular_estado_final(estado):
     pedidos = estado["Pedidos por atender"]
     inventario = estado["Inventario"]
 
+    # Carta 3: prohibir produccion
+    if estado["TurnosBloqueoVentasCarta3"]>0:
+        estado["TurnosBloqueoVentasCarta3"] -= 1
+    elif estado["TurnosBloqueoVentasCarta3"]==0 and estado["TurnosBloqueoVentas"]==0:
+        estado["Prohibir ventas"] = False
+
     # Carta 24: Bloqueo logístico
     if estado["TurnosBloqueoVentas"] > 0:
         ventas = 0
-    else:
-        ventas = min(pedidos, inventario)
 
     # Aplicar boicot, verifica contador
     if estado["TurnosBoicot"] > 0:
