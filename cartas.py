@@ -353,7 +353,6 @@ def aplicar_carta(numero, estado):
     #   - Ventas −25%
     #   - reputación baja 2 niveles
     # Duración: 2 turnos
-
     elif numero == 34:
         estado["MultiplicadorVentas"] = 0.75*estado["MultiplicadorVentas"]
         reputaciion_mercado = int(estado["Reputacion del mercado"].split()[-1]) - 2
