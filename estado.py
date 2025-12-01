@@ -167,7 +167,7 @@ def calcular_estado_final(estado):
     precio_venta = 4.5
     pedidos = estado["Pedidos por atender"]
     inventario = estado["Inventario"]
-    #
+    # 
     ventas = min(pedidos, inventario)
     # Aplicar boicot, verifica contador
     if estado["TurnosBoicot"] > 0:
