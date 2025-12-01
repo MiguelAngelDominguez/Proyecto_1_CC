@@ -17,7 +17,7 @@ def calcular_estado_inicial():
         "Cantidad de empleados":             empleados,
         "EmpleadosTemporales":               0,
         "Costo por empleado":                costo_emp,
-        "Sueldos por pagar ":                 empleados * costo_emp,
+        "Sueldos por pagar":                 empleados * costo_emp,
         "Deuda pendiente":                   20000,
         "Reputacion del mercado":            "Nivel 3",
         "Multas e indemnizaciones":          0,
@@ -72,7 +72,6 @@ def calcular_estado_inicial():
         "TurnosBloqueoVentas":               0,
         #carta 28:
         "TurnosCostos":                      0,
-        "MultiplicadorCostos":               1.0,
         #carta 15:
         "TurnosProhibicionComprasNacionales":0,
         #de acciones
@@ -293,7 +292,7 @@ def calcular_estado_final(estado):
     if estado["TurnosCostos"] > 0:
         estado["TurnosCostos"] -= 1
         if estado["TurnosCostos"] == 0:
-            estado["MultiplicadorCostos"] = 1.0
+            estado["Sueldos por pagar"] = estado["Cantidad de empleados"] * estado["Costo por empleado"]
 
     # Carta 37: Accidente
     if estado["TurnosAccidente"] > 0:
