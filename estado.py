@@ -142,6 +142,7 @@ def calcular_estado_final(estado):
     # Aplicar boicot, verifica contador
     if estado["TurnosBoicot"] > 0:
         ventas = int(ventas*estado["ReductorBoicot"])
+        estado["TurnosBoicot"] -= 1
         # Si el boicot ya terminó restaurar reductor
         if estado["TurnosBoicot"] == 0:
             estado["ReductorBoicot"] = 1.0
@@ -228,15 +229,13 @@ def calcular_estado_final(estado):
     ## Carta 6:
     if estado["TurnosDemandaReducida"] > 0:
         estado["TurnosDemandaReducida"] -= 1
-        if estado["TurnosDemandaReducida"] == 0:
-            estado["TurnosDemandaReducida"] = 1.0
 
 
     ## Carta 9: Huelga por ambiente laboral
     # TurnosProhibidos (huelga u otros bloqueos)
     if estado["TurnosProhibirProduccion"] > 0:
         estado["TurnosProhibirProduccion"] -= 1
-        # Si se acaban los turnos, cambiar flag prohibición
+        # Si se acaban los turnos, liberar la prohibición
         if estado["TurnosProhibirProduccion"] == 0:
             estado["Prohibir Produccion"] = False
 

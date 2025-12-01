@@ -100,7 +100,7 @@ def aplicar_carta(numero, estado):
         elif estado['Bloqueodeclima']:
             numero = 1
             aplicar_carta(numero, estado)
-            return estado
+        return estado
 
     # Carta 9: Huelga por ambiente laboral
     #   - La proxima ronda no se produce.
@@ -167,11 +167,15 @@ def aplicar_carta(numero, estado):
     # Carta 14: Retraso en importacion
     #   - Prohibir insumos importados las siguientes 3 rondas:
     elif numero == 14:
+        estado["Prohibir Importaciones"] = True
+        estado["TurnosImportaciones"] = 3
         return estado
 
     # Carta 15: Proveedores en huelga
     #   - Prohibir compras nacionales las siguientes 4 rondas:
     elif numero == 15:
+        estado["Prohibir Compras Nacionales"] = True
+        estado["TurnosProhibicionComprasNacionales"] = 4
         return estado
 
     # Carta 16: Estafa financiera
@@ -196,6 +200,8 @@ def aplicar_carta(numero, estado):
     #   - Produccion a la mitad este turno
     # Duración: 3 turnos
     elif numero == 18:
+        estado["TurnosPlaga"] = 3
+
         return estado
 
     # Carta 19: Cliente corporativo VIP cancela pedido
@@ -238,6 +244,7 @@ def aplicar_carta(numero, estado):
     #   - No se venden unidades
     # Duración: 2 turnos
     elif numero == 24:
+        estado["TurnosBloqueoVentas"] = 2
         return estado
 
     # Carta 25: Demanda judicial
@@ -251,7 +258,7 @@ def aplicar_carta(numero, estado):
     #   - Debemos pagar 5,000 por almacén
     # Duración: 3 turnos
     elif numero == 26:
-        estado["Turnos"]
+
         return estado
 
     # Carta 27: Robo interno
@@ -346,6 +353,10 @@ def aplicar_carta(numero, estado):
     #   - Produccion −50% este mes
     #   - Temporalmente -1 trabajador por 2 turnos
     elif numero == 37:
+        estado["Multas e indemnizaciones"] += 4000
+        estado["TurnosAccidente"] = 2
+        estado["Cantidad de empleados"] -= 1
+
         return estado
 
     # Carta 38: Derrame quimico
@@ -364,6 +375,7 @@ def aplicar_carta(numero, estado):
     #   No puedes contratar empleados nuevos
     # Duración: 5 turnos
     elif numero == 40:
+        estado["TurnosHiringFreeze"] = 5
         return estado
 
     # Si el numero no coincide con ninguna carta:
