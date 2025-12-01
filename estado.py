@@ -206,7 +206,6 @@ def calcular_estado_final(estado):
     estado["Pedidos por atender"]   = estado["Pedidos por atender"]
     estado["Reputacion del mercado"] = estado["Reputacion del mercado"]
     # Obtener nivel de reputación
-    nivel_rep = int(estado["Reputacion del mercado"].split()[-1])
 
 
     # ============================
@@ -221,13 +220,12 @@ def calcular_estado_final(estado):
         # 12% de interés total
         estado["Deuda"] += deuda * 1.12
         estado["Caja disponible"] = 0
-    estado["Sueldos por pagar"]=0
 
 
     # ============================
     # 4) Generacion de la nomina del proximo mes
     # ============================
-    estado["Sueldos por pagar"]     = estado["Sueldos por pagar"]
+
 
 
     # ============================
