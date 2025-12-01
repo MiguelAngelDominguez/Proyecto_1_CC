@@ -52,7 +52,7 @@ def aplicar_carta(numero, estado):
         estado["Multas e indemnizaciones"] += 5000
         partes = estado["Reputacion del mercado"].split(' ')
         num = int(partes[1]) - 1
-        estado["Reputacion del mercado"] = f'Nivel {num}'
+        estado["Reputacion del mercado"] = f'Nivel {max(0,num)}'
         return estado
 
     # Carta 6: Producto retirado del mercado
