@@ -322,6 +322,10 @@ def aplicar_carta(numero, estado):
     #   - reputación baja 2 niveles
     # Duración: 2 turnos
     elif numero == 34:
+        # ventaz
+        partes = estado["Reputacion del mercado"].split(' ')
+        num = int(partes[1]) - 2
+        estado["Reputacion del mercado"] = f'Nivel {max(0, num)}'
         return estado
 
     # Carta 35: Cliente se intoxica

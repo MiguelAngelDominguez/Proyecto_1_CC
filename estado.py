@@ -262,4 +262,11 @@ def calcular_estado_final(estado):
         # El contador disminuye cada turno
         estado['ContadordeBloqueodeclima'] = estado['ContadordeBloqueodeclima'] - 1
 
+
+    #==============================================================
+    # Poner bien la reputacion del mercado, por si esta en negativo
+    #==============================================================
+    if estado["Reputacion del mercado"].split(' ')[1] < 0:
+        estado["Reputacion del mercado"] = f'Nivel 0'
+
     return estado
