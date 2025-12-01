@@ -17,7 +17,7 @@ def calcular_estado_inicial():
         "Cantidad de empleados":             empleados,
         "EmpleadosTemporales":               0,
         "Costo por empleado":                costo_emp,
-        "Sueldos por pagar":                 empleados * costo_emp,
+        "Sueldos por pagar ":                 empleados * costo_emp,
         "Deuda pendiente":                   20000,
         "Reputacion del mercado":            "Nivel 3",
         "Multas e indemnizaciones":          0,
@@ -37,20 +37,29 @@ def calcular_estado_inicial():
         "MantenimientoHecho":                False,
         "EcommerceActivo":                   False,
         "InventarioMesAnterior":             0,
+
         'TurnoEmpleadostemporales':          0,
         'IncentivosActivos':                 False,
         'ContadordeIncentivosActivos':       0,
+
         'Bloqueodeclima':                    False,
         'ContadordeBloqueodeclima':          0,
         # Banadera de creditos activos
         "CreditoConcedido":                  False,
 
-        # Contador de Turnos de prohibicion
-        "TurnosProhibidos":                  0,
+        # Carta 9
+        "TurnosProhibirProduccion":          0,
 
+        #"TurnosDemandaExtra":                0,
+        #"TurnosBloqueoDemanda":              0,
         "TurnosVentasExtra":                 0,
         "DemandaExtraProximoMes":            0,
-        "MultiplicadorVentas":               0
+        "MultiplicadorVentas":               0,
+        # Carta 6
+        "TurnosDemandaReducida":             0,
+        # Carta 12
+        "TurnosBoicot":                      0,
+        "ReductorBoicot":                    1.0
     }
 
 def calcular_estado_final(estado):
@@ -98,7 +107,7 @@ def calcular_estado_final(estado):
 
     6) Produccion en automatico
        - Si ‘TurnosProduccionExtra’ > 0:
-         • Se produce en automatco la misma cantidad del turno anterior (sin gastar insumos).
+         • Se produce en automatico la misma cantidad del turno anterior (sin gastar insumos).
          • No debes disminuir ‘TurnosProduccionExtra’ porque dicho valor se reduce en el punto 7)
 
     7) Actualizacion de flags temporales y decremento de contadores
@@ -115,26 +124,71 @@ def calcular_estado_final(estado):
          entonces, el excedente caduca (hasta completar el 10% que vence).
        - Puedes apoyarte de las variables "InventarioMesAnterior" e "Inventario"
     """
+
+    # ============================
     # 1) Venta automatica
+    # ============================
     estado["Inventario"]            = estado["Inventario"]
     estado["Unidades vendidas"]     = estado["Unidades vendidas"]
     estado["Caja disponible"]       = estado["Caja disponible"]
 
+    ## Carta 12: Boicot de clientes
+    precio_venta = 4.5
+    pedidos = estado["Pedidos por atender"]
+    inventario = estado["Inventario"]
+    #
+    ventas = min(pedidos, inventario)
+    # Aplicar boicot, verifica contador
+    if estado["TurnosBoicot"] > 0:
+        ventas = int(ventas*estado["ReductorBoicot"])
+        estado["TurnosBoicot"] -= 1
+        # Si el boicot ya terminó restaurar reductor
+        if estado["TurnosBoicot"] == 0:
+            estado["ReductorBoicot"] = 1.0
+    # Asegurar que no se venda más inventario del disponible
+    ventas = min(ventas, inventario)
+    # Actualizar estado
+    estado["Inventario"] -= ventas
+    estado["Unidades vendidas"] += ventas
+    estado["Caja disponible"] += ventas * precio_venta
+    estado["Pedidos por atender"] -= ventas
+
+
+    # ============================
     # 2) Actualizacion de pedidos por atender
+    # ============================
     estado["Pedidos por atender"]   = estado["Pedidos por atender"]
     estado["Reputacion del mercado"] = estado["Reputacion del mercado"]
+    # Obtener nivel de reputación
+    nivel_rep = int(estado["Reputacion del mercado"].split()[-1])
 
+
+    # ============================
     # 3) Pago de la nomina del mes actual
-    estado["Sueldos por pagar"]     = estado["Sueldos por pagar"]
-    estado["Caja disponible"]       = estado["Caja disponible"]
+    # ============================
+    estado["Sueldos por pagar"] = estado["Sueldos por pagar"]
+    estado["Caja disponible"] = estado["Caja disponible"]
 
+
+    # ============================
     # 4) Generacion de la nomina del proximo mes
+    # ============================
     estado["Sueldos por pagar"]     = estado["Sueldos por pagar"]
 
+
+    # ============================
     # 5) Anular multas, accidentes, y demas cartas del caos
+    # ============================
     estado["Prohibir Produccion"]   = estado["Prohibir Produccion"]
 
-    # 6) Produccion en automatico (modifico para rh_incentivos)
+
+    # ============================
+    # 6) Produccion en automatico
+    #    - Si ‘TurnosProduccionExtra’ > 0:
+    #     • Se produce en automatico la misma cantidad del turno anterior (sin gastar insumos).
+    #     • No debes disminuir ‘TurnosProduccionExtra’ porque dicho valor se reduce en el punto 7)
+    # ============================
+    ## Carta
     if estado['ContadordeIncentivosActivos'] == 0:
         estado['IncentivosActivos'] = False
 
@@ -145,13 +199,62 @@ def calcular_estado_final(estado):
     else: # Falta modificar para quien lo use
         estado["Inventario"] = estado["Inventario"]
 
-    # 7) Actualizacion de flags temporales y decremento de contadores
-    estado["TurnosProduccionExtra"] = estado["TurnosProduccionExtra"]
+    ## Carta 9: Huelga por ambiente laboral
+    """if not estado["Prohibir Produccion"] and estado["TurnosProduccionExtra"] > 0:
+        # Se produce lo mismo que en el mes anterior
+        maquinas_str = estado["Maquinas (total/activas/dañadas)"]
+        partes = maquinas_str.split('/')
+        maquinas_activas = int(partes[1])
+        # 2000 unidades por máquina (sin gastar insumos)
+        produccion_automatica = maquinas_activas * 2000
+        # Actualizar inventario
+        estado["Inventario"] += produccion_automatica"""
 
+
+    # ============================
+    # 7) Actualizacion de flags temporales y decremento de contadores
+    # ============================
+    estado["TurnosProduccionExtra"] = estado["TurnosProduccionExtra"]
+    # Ventas extra por campaña
+    if estado["TurnosVentasExtra"] > 0:
+        estado["TurnosVentasExtra"] -= 1
+        if estado["TurnosVentasExtra"] == 0:
+            estado["MultiplicadorVentas"] = 1.0
+    # Bloqueo de campañas - cartas
+    if estado["TurnosBloqueoDemanda"] > 0:
+        estado["TurnosBloqueoDemanda"] -= 1
+    # FALTAAAAA
+
+    ## Carta 6:
+    if estado["TurnosDemandaReducida"] > 0:
+        estado["TurnosDemandaReducida"] -= 1
+        """if estado["TurnosDemandaReducida"] == 0:
+            estado["ReductorDemanda"] = 1.0"""
+
+
+    ## Carta 9: Huelga por ambiente laboral
+    # TurnosProhibidos (huelga u otros bloqueos)
+    if estado["TurnosProhibirProduccion"] > 0:
+        estado["TurnosProhibirProduccion"] -= 1
+        # Si se acaban los turnos, liberar la prohibición
+        if estado["TurnosProhibirProduccion"] == 0:
+            estado["Prohibir Produccion"] = False
+
+    ## Carta 12:
+    if estado["TurnosBoicot"] > 0:
+        estado["TurnosBoicot"] -= 1
+        if estado["TurnosBoicot"] == 0:
+            estado["TurnosBoicot"] = 0
+    else:
+        estado["TurnosBoicot"] = 0
+
+
+    # ============================
     # 8) Perdida de inventario:
+    # ============================
     estado["Inventario"]            = estado["Inventario"]
 
-    # Carta 8 -> (modifico para rh_incentivos)
+    ## Carta 8 -> (modifico para rh_incentivos)
     if estado['ContadordeBloqueodeclima'] == 0:
         estado['Bloqueodeclima'] = False
 

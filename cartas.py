@@ -35,7 +35,7 @@ def aplicar_carta(numero, estado):
 
         partes = estado["Reputacion del mercado"].split(' ')
         num = int(partes[1]) - 1
-        estado["Reputacion del mercado"] = f'Nivel {num}'
+        estado["Reputacion del mercado"] = f'Nivel {max(0, num)}'
         return estado
 
     # Carta 4: Incendio en almacen
@@ -61,11 +61,28 @@ def aplicar_carta(numero, estado):
     #   - Luego, la demanda actual se reduce en 50%
     # Duración: 2 turnos
     elif numero == 6:
+        # reponer mercaderia, significa que debido a el problema del producto, hubo que retirar
+        # la mercaderia y reponer
+        # tras el incidente, la demanda se contrae(menos pedidos) por un tiempo
+        # 1) Bajar reputación 2 niveles
+        nivel = int(estado["Reputacion del mercado"].split()[-1])
+        estado["Reputacion del mercado"] = f"Nivel {max(0, nivel - 2)}"
+        # 2) Eliminar inventario equivalente a la demanda actual
+        demanda = estado["Pedidos por atender"]
+        estado["Inventario"] = max(0, estado["Inventario"] - demanda)
+        estado["Pedidos por atender"] = int(demanda * 0.5)
+        # 3) Activar 2 turnos
+        estado["TurnosDemandaReducida"] += 2
         return estado
 
     # Carta 7: Robo de insumos
     #   - Pierdes 30% de insumos disponibles.
     elif numero == 7:
+        perdida = 0.3
+        if estado["Insumos disponibles"] > 0:
+            estado["Insumos disponibles"] = max(0, estado["Insumos disponibles"]*(1-perdida))
+        else:
+            estado["Insumos disponibles"] = 0
         return estado
 
     # Carta 8: Fuga de talento clave
@@ -85,13 +102,20 @@ def aplicar_carta(numero, estado):
         elif estado['Bloqueodeclima']:
             numero = 1
             aplicar_carta(numero, estado)
-            return estado
+        return estado
 
     # Carta 9: Huelga por ambiente laboral
     #   - La proxima ronda no se produce.
     #   - Los clientes se enteran de la huelga y baja la reputación 3 niveles
     # Duración: 2 turnos
     elif numero == 9:
+        # 1) Activar prohibición de producción
+        estado["Prohibir Produccion"] = True
+        # Aumentar turnos
+        estado["TurnosProhibirProduccion"] += 2
+        # 2) Bajar reputación 3 niveles
+        nivel = int(estado["Reputacion del mercado"].split()[-1])
+        estado["Reputacion del mercado"] = f"Nivel {max(0, nivel - 3)}"
         return estado
 
     # Carta 10: Hacker secuestra datos
@@ -99,18 +123,39 @@ def aplicar_carta(numero, estado):
     #   - Reputacion baja 2 niveles
     #   - Te aplican una multa de 5,000 soles por malas practicas de seguridad de la informacion
     elif numero == 10:
+        perdida = 5000
+        interes = 0.12
+
+        if estado["Caja disponible"] < perdida:
+            deuda = (perdida - estado["Caja disponible"])*(1 + interes)
+            estado["Deuda pendiente"] += deuda
+            estado["Caja disponible"] = 0
+        else:
+            estado["Caja disponible"] -= perdida
+
+        nivel = int(estado["Reputacion del mercado"].split()[-1])
+        estado["Reputacion del mercado"] = f"Nivel {max(0, nivel - 2)}"
+
+        estado["Multas e indemnizaciones"] += 5000
         return estado
 
- # Carta 11: Multa ambiental
+
+    # Carta 11: Multa ambiental
     #   - Aumentan “Multas e indemnizaciones” en +5000.
     #   - Reputacion del mercado −1 nivel.
     elif numero == 11:
+        estado["Multas e indemnizaciones"] += 5000
+        nivel = int(estado["Reputacion del mercado"].split()[-1])
+        estado["Reputacion del mercado"] = f"Nivel {max(0,nivel-1)}"
         return estado
+
 
     # Carta 12: Boicot de clientes
     #   - Ventas de esta semana reducidas al 50%:
     # Duración: 2 turnos
     elif numero == 12:
+        estado["ReductorBoicot"] = 0.5
+        estado["TurnosBoicot"] = 2
         return estado
 
     # Carta 13: Error de etiquetado
@@ -124,37 +169,58 @@ def aplicar_carta(numero, estado):
     # Carta 14: Retraso en importacion
     #   - Prohibir insumos importados las siguientes 3 rondas:
     elif numero == 14:
+        estado["Prohibir Importaciones"] = True
+        estado["TurnosImportaciones"] = 3
         return estado
 
     # Carta 15: Proveedores en huelga
     #   - Prohibir compras nacionales las siguientes 4 rondas:
     elif numero == 15:
+        estado["Prohibir Compras Nacionales"] = True
+        estado["TurnosProhibicionComprasNacionales"] = 4
         return estado
 
     # Carta 16: Estafa financiera
     #   - Pierdes 8,000 de caja
     elif numero == 16:
+        if estado["Caja disponible"] < 8000:
+            deuda = (8000 - estado["Caja disponible"])
+            estado["Deuda pendiente"] += deuda
+            estado["Caja disponible"] = 0
+        else:
+            estado["Caja disponible"] -= 8000
         return estado
 
     # Carta 17: Rumor de corrupcion
     #   - Reputacion del mercado −2 niveles.
     elif numero == 17:
+        nivel = int(estado["Reputacion del mercado"].split()[-1])
+        estado["Reputacion del mercado"] = f"Nivel {max(0, nivel - 2)}"
         return estado
 
     # Carta 18: Plaga en planta
     #   - Produccion a la mitad este turno
     # Duración: 3 turnos
     elif numero == 18:
+        estado["TurnosPlaga"] = 3
+
         return estado
 
-    # Carta 19: Cliente corproativo VIP cancela pedido
-    #   - Peirdes un tercio de los “Pedidos por atender”.
+    # Carta 19: Cliente corporativo VIP cancela pedido
+    #   - Pierdes un tercio de los “Pedidos por atender”.
     elif numero == 19:
+        perdida = 1/3
+        if estado["Pedidos por atender"] > 0:
+            estado["Pedidos por atender"] = max(0, estado["Pedidos por atender"]*(1-perdida))
+        else:
+            estado["Pedidos por atender"] = 0
         return estado
 
     # Carta 20: Producto defectuoso viral
     #   - Reputacion del mercado −3 niveles.
     elif numero == 20:
+        nivel = int(estado["Reputacion del mercado"].split()[-1])
+        estado["Reputacion del mercado"] = f"Nivel {max(0, nivel - 3)}"
         return estado
 
     # Carta 21: Mal clima: inundacion
@@ -172,35 +238,47 @@ def aplicar_carta(numero, estado):
     # Carta 23: Fake news en redes
     #   - Reputacion del mercado −2 niveles.
     elif numero == 23:
+        nivel = int(estado["Reputacion del mercado"].split()[-1])
+        estado["Reputacion del mercado"] = f"Nivel {max(0, nivel - 2)}"
         return estado
 
     # Carta 24: Bloqueo logistico
     #   - No se venden unidades
     # Duración: 2 turnos
     elif numero == 24:
+        estado["TurnosBloqueoVentas"] = 2
         return estado
 
     # Carta 25: Demanda judicial
     #   - Multas e indemnizaciones +15,000.
     elif numero == 25:
+        estado["Multas e indemnizaciones"] += 15000
         return estado
 
     # Carta 26: Nuevo competidor agresivo
     #   - Ventas −40%:
     #   - Debemos pagar 5,000 por almacén
     # Duración: 3 turnos
-
     elif numero == 26:
+
         return estado
 
     # Carta 27: Robo interno
     #   - Caja se reduce en 10,000.
     elif numero == 27:
+        if estado["Caja disponible"] < 10000:
+            deuda = (10000 - estado["Caja disponible"])
+            estado["Deuda pendiente"] += deuda
+            estado["Caja disponible"] = 0
+        else:
+            estado["Caja disponible"] -= 10000
         return estado
 
     # Carta 28: Crisis economica
     #   - Todos los costos +10% por los siguientes 5 turnos:
     elif numero == 28:
+        estado["MultiplicadorCostos"] = 1.10
+        estado["TurnosCostos"] = 5
         return estado
 
     # Carta 29: Fuga de datos
@@ -225,6 +303,12 @@ def aplicar_carta(numero, estado):
     # Carta 32: Error contable
     #   - Caja −7000.
     elif numero == 32:
+        if estado["Caja disponible"] < 7000:
+            deuda = (7000 - estado["Caja disponible"])
+            estado["Deuda pendiente"] += deuda
+            estado["Caja disponible"] = 0
+        else:
+            estado["Caja disponible"] -= 7000
         return estado
 
     # Carta 33: Error en codigo de barras
@@ -244,6 +328,10 @@ def aplicar_carta(numero, estado):
     #   - Reputacion del mercado −3 niveles.
     #   - Multas +30,000.
     elif numero == 35:
+        nivel = int(estado["Reputacion del mercado"].split()[-1])
+        estado["Reputacion del mercado"] = f"Nivel {max(0, nivel - 2)}"
+
+        estado["Multas e indemnizaciones"] += 30000
         return estado
 
     # Carta 36: Fraude en prestamo
@@ -251,6 +339,17 @@ def aplicar_carta(numero, estado):
     #   - Deuda pendiente +15,000.
     #   - reputación baja 2 niveles
     elif numero == 36:
+        if estado["Caja disponible"] < 15000:
+            deuda = (15000 - estado["Caja disponible"])
+            estado["Deuda pendiente"] += deuda
+            estado["Caja disponible"] = 0
+        else:
+            estado["Caja disponible"] -= 15000
+
+        estado["Deuda pendiente"] += 15000
+
+        nivel = int(estado["Reputacion del mercado"].split()[-1])
+        estado["Reputacion del mercado"] = f"Nivel {max(0, nivel - 2)}"
         return estado
 
     # Carta 37: Trabajador se accidenta
@@ -258,6 +357,10 @@ def aplicar_carta(numero, estado):
     #   - Produccion −50% este mes
     #   - Temporalmente -1 trabajador por 2 turnos
     elif numero == 37:
+        estado["Multas e indemnizaciones"] += 4000
+        estado["TurnosAccidente"] = 2
+        estado["Cantidad de empleados"] -= 1
+
         return estado
 
     # Carta 38: Derrame quimico
@@ -276,6 +379,7 @@ def aplicar_carta(numero, estado):
     #   No puedes contratar empleados nuevos
     # Duración: 5 turnos
     elif numero == 40:
+        estado["TurnosHiringFreeze"] = 5
         return estado
 
     # Si el numero no coincide con ninguna carta:
