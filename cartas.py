@@ -261,6 +261,7 @@ def aplicar_carta(numero, estado):
     #   - No se venden unidades
     # Duración: 2 turnos
     elif numero == 24:
+        estado["Prohibir ventas"] = True
         estado["TurnosBloqueoVentas"] = 2
         return estado
 

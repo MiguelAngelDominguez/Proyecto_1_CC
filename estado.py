@@ -175,8 +175,10 @@ def calcular_estado_final(estado):
         # Si el boicot ya terminó restaurar reductor
         if estado["TurnosBoicot"] == 0:
             estado["ReductorBoicot"] = 1.0
+
     # Asegurar que no se venda más inventario del disponible
     estado['Ventas'] = min(estado['Ventas'], inventario)
+
     # Actualizar estado
     estado["Inventario"] -= estado['Ventas']
     estado["Unidades vendidas"] += estado['Ventas']
@@ -185,15 +187,14 @@ def calcular_estado_final(estado):
 
     # Carta 24: Bloqueo logístico
     if estado["TurnosBloqueoVentas"] > 0:
-        ventas = 0
-    else:
-        ventas = min(pedidos, inventario)
-        
+        estado["TurnosBloqueoVentas"] -= 1
+
+    if estado["Prohibir ventas"]:
+        estado['Ventas'] = 0
+
     # Carta 3: prohibir produccion
     if estado["TurnosBloqueoVentasCarta3"]>0:
         estado["TurnosBloqueoVentasCarta3"] -= 1
-    elif estado["TurnosBloqueoVentasCarta3"]==0 and estado["TurnosBloqueoVentas"]==0:
-        estado["Prohibir ventas"] = False
 
 
 
@@ -362,5 +363,6 @@ def calcular_estado_final(estado):
         if estado["TurnosImportaciones"] == 0:
             estado["Prohibir Importaciones"] = False
 
-
+    if estado["TurnosBloqueoVentasCarta3"]==0 and estado["TurnosBloqueoVentas"]==0:
+        estado["Prohibir ventas"] = False
     return estado
