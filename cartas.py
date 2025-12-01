@@ -277,7 +277,7 @@ def aplicar_carta(numero, estado):
     # Carta 28: Crisis economica
     #   - Todos los costos +10% por los siguientes 5 turnos:
     elif numero == 28:
-        estado["MultiplicadorCostos"] = 1.10
+        estado["Sueldos por pagar"] = estado["Cantidad de empleados"] * estado["Costo por empleado"] * 1.10
         estado["TurnosCostos"] = 5
         return estado
 
