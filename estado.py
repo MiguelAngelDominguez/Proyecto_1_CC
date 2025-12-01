@@ -55,6 +55,9 @@ def calcular_estado_inicial():
         "TurnosVentasExtra":                 0,
         "DemandaExtraProximoMes":            0,
         "MultiplicadorVentas":               0,
+        # Carta 6
+        "ReductorDemanda":                   1.0,
+        "TurnosDemandaReducida":             0,
         # Carta 12
         "TurnosBoicot":                      0,
         "ReductorBoicot":                    1.0
@@ -157,6 +160,8 @@ def calcular_estado_final(estado):
     # ============================
     estado["Pedidos por atender"]   = estado["Pedidos por atender"]
     estado["Reputacion del mercado"] = estado["Reputacion del mercado"]
+    # Obtener nivel de reputación
+    nivel_rep = int(estado["Reputacion del mercado"].split()[-1])
 
 
     # ============================
@@ -226,6 +231,11 @@ def calcular_estado_final(estado):
     if estado["TurnosBloqueoDemanda"] > 0:
         estado["TurnosBloqueoDemanda"] -= 1
     # FALTAAAAA
+
+    ## Carta 6:
+    if estado["TurnosDemandaReducida"] > 0:
+        estado["TurnosDemandaReducida"] -= 1
+
 
     ## Carta 9: Huelga por ambiente laboral
     # TurnosProhibidos (huelga u otros bloqueos)

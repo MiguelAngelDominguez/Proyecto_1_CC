@@ -61,9 +61,14 @@ def aplicar_carta(numero, estado):
     #   - Luego, la demanda actual se reduce en 50%
     # Duración: 2 turnos
     elif numero == 6:
-        #
+        # 1) Bajar reputación 2 niveles
         nivel = int(estado["Reputacion del mercado"].split()[-1])
         estado["Reputacion del mercado"] = f"Nivel {max(0, nivel - 2)}"
+        # 2) Eliminar inventario equivalente a la demanda actual
+        demanda = estado["Pedidos por atender"]
+        estado["Inventario"] = max(0, estado["Inventario"] - demanda)
+        # 3) Activar 2 turnos
+        estado["TurnosDemandaReducida"] = 2
         estado["ReductorDemanda"] = 0.5
         return estado
 
@@ -145,8 +150,8 @@ def aplicar_carta(numero, estado):
     #   - Ventas de esta semana reducidas al 50%:
     # Duración: 2 turnos
     elif numero == 12:
-        estado["ReductorBoicot"] == 0.5
-        estado["TurnosBoicot"] == 2
+        estado["ReductorBoicot"] = 0.5
+        estado["TurnosBoicot"] = 2
         return estado
 
     # Carta 13: Error de etiquetado
