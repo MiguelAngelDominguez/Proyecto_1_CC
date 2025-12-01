@@ -60,8 +60,24 @@ def calcular_estado_inicial():
         "TurnosDemandaReducida":             0,
         # Carta 12
         "TurnosBoicot":                      0,
-        "ReductorBoicot":                    1.0
+        "ReductorBoicot":                    1.0,
+        #carta 37:
+        "TurnosAccidente":                   0,
+        #carta 18:
+        "TurnosPlaga":                       0,
+        #carta 40:
+        "TurnosHiringFreeze":                0,
+        #carta 14:
+        "TurnosImportaciones":               0,
+        #carta 24:
+        "TurnosBloqueoVentas":                0,
+        #carta 15:
+        "TurnosProhibicionComprasNacionales":  0,
+        #de acciones
+        "Coeficiente de produccion":           0,
+        "TurnosMantenimiento": 0
     }
+
 
 def calcular_estado_final(estado):
     """
@@ -137,11 +153,16 @@ def calcular_estado_final(estado):
     precio_venta = 4.5
     pedidos = estado["Pedidos por atender"]
     inventario = estado["Inventario"]
-    #
-    ventas = min(pedidos, inventario)
+
+    # Carta 24: Bloqueo logístico
+    if estado["TurnosBloqueoVentas"] > 0:
+        ventas = 0
+    else:
+        ventas = min(pedidos, inventario)
+
     # Aplicar boicot, verifica contador
     if estado["TurnosBoicot"] > 0:
-        ventas = int(ventas*estado["ReductorBoicot"])
+        ventas = int(ventas * estado["ReductorBoicot"])
         estado["TurnosBoicot"] -= 1
         # Si el boicot ya terminó restaurar reductor
         if estado["TurnosBoicot"] == 0:
@@ -247,6 +268,35 @@ def calcular_estado_final(estado):
     else:
         estado["TurnosBoicot"] = 0
 
+    # Carta 14: Prohibir importaciones
+    if estado["TurnosImportaciones"] > 0:
+        estado["TurnosImportaciones"] -= 1
+        if estado["TurnosImportaciones"] == 0:
+            estado["Prohibir Importaciones"] = False
+
+    # Carta 15: Prohibir compras nacionales
+    if estado["TurnosProhibicionComprasNacionales"] > 0:
+        estado["TurnosProhibicionComprasNacionales"] -= 1
+        if estado["TurnosProhibicionComprasNacionales"] == 0:
+            estado["Prohibir Compras Nacionales"] = False
+
+    # Carta 18: Plaga
+    if estado["TurnosPlaga"] > 0:
+        estado["TurnosPlaga"] -= 1
+
+    # Carta 24: Bloqueo logístico
+    if estado["TurnosBloqueoVentas"] > 0:
+        estado["TurnosBloqueoVentas"] -= 1
+
+    # Carta 37: Accidente
+    if estado["TurnosAccidente"] > 0:
+        estado["TurnosAccidente"] -= 1
+        if estado["TurnosAccidente"] == 0:
+            estado["Cantidad de empleados"] += 1
+
+    # Carta 40: Hiring Freeze
+    if estado["TurnosHiringFreeze"] > 0:
+        estado["TurnosHiringFreeze"] -= 1
 
     # ============================
     # 8) Perdida de inventario:

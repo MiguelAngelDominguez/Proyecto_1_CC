@@ -23,61 +23,52 @@ def produccion_producir(estado):
            • Esto se debe a que el proceso productivo tiene diferentes fases
        - Si no hay suficientes insumos no se puede producir.
        """
-
     # Verificar prohibicion
     # Si la producción está prohibida, se cuenta el turno prohibido y la función termina.
     if estado["Prohibir Produccion"]:
         return estado
 
-    # Extraemos el número de máquinas activas:
-    maquinas_str = estado["Maquinas (total/activas/dañadas)"]
-    partes = maquinas_str.split('/')
+    #Obtenemos las maquinas activas:
+    partes = estado["Maquinas (total/activas/dañadas)"].split("/")
     maquinas_activas = int(partes[1])
 
-    # Creamos constantes y contadores
-    insumos_por_maquina = 40000
-    produccion_por_maquina = 2000
-    total_insumos_necesarios = 0
-    total_produccion = 0
+    #Verficiamos cuantas maquinas pueden producir:
     maquinas_que_producen = 0
 
-    # Calculamos la producción, verificando cuantas maquinas pueden producir:
     for i in range(maquinas_activas):
-        insumos_necesarios = (maquinas_que_producen + 1) * insumos_por_maquina
-
-        if estado["Insumos disponibles"] >= insumos_necesarios:
+        if estado["Insumos disponibles"] >= 40000:
             maquinas_que_producen += 1
+            estado["Insumos disponibles"] -= 40000
         else:
-            # Si no hay suficientes insumos para la siguiente máquina, se detiene el proceso.
             break
 
-    # Si hay producción, se calculan los totales base (insumos a gastar y productos fabricados).
-    if maquinas_que_producen > 0:
-        total_insumos_necesarios = maquinas_que_producen * insumos_por_maquina
-        total_produccion = maquinas_que_producen * produccion_por_maquina
+    if maquinas_que_producen == 0:
+        return estado
+    #Calculamos la produccion de las maquinas que producen:
+    produccion = maquinas_que_producen * 2000
 
-    # Aplicar bonificación por empleados:
+    #Aplicar bonificación por empleados:
     empleados_base = 4
-    # Se calcula la cantidad de empleados que dan bonificación (adicionales a la base).
-    empleados_adicionales = estado["Cantidad de empleados"] - empleados_base + estado["EmpleadosTemporales"]
+    empleados_totales = estado["Cantidad de empleados"] + estado["EmpleadosTemporales"]
+    empleados_extra = empleados_totales - empleados_base
 
-    # Si hay empleados adicionales, se aumenta la producción un 10% por cada uno.
-    if empleados_adicionales > 0:
-        bonificacion = total_produccion * (empleados_adicionales * 0.10)
-        total_produccion += bonificacion
+    if empleados_extra > 0:
+        produccion = produccion * (1 + empleados_extra * 0.10)
 
-    # Actualizamos el estado
-    # Se consume la cantidad de insumos y se añade el total al inventario.
-    estado["Insumos disponibles"] -= total_insumos_necesarios
-    estado["Inventario"] += total_produccion
+    #Si en caso se ejecuta la accion mejorar proceso, por cada turno aplicaremos un 5% de eficiciencia:
+    produccion = produccion * (1 + estado["Coeficiente de produccion"])
+    #carta 18:
+    if estado["TurnosPlaga"] > 0:
+        produccion = produccion * 0.5
+    #carta 37:
+    if estado["TurnosAccidente"] > 0:
+        produccion *= 0.5
 
-    # Se programa la producción extra para los siguientes dos turnos.
+    #modificamos el estado:
+    estado["Inventario"] += produccion
     estado["TurnosProduccionExtra"] += 2
 
-    # Devolvemos el estado modificado
     return estado
-
-
 
 
 def produccion_pedido_encargo(estado):
@@ -93,6 +84,11 @@ def produccion_pedido_encargo(estado):
         • No hace nada (no varia ningun campo).
     - Si no hay suficientes insumos disponibles, no se puede producir por encargo.
     """
+    if estado["Prohibir Produccion"] or estado["Insumos disponibles"]<10000:
+        return estado
+    else:
+        estado["Caja disponible"]+=50000
+        estado["Insumos disponibles"]-=10000
     return estado
 
 def produccion_mejorar_proceso(estado):
@@ -100,13 +96,15 @@ def produccion_mejorar_proceso(estado):
     3. Mejorar proceso:
     - Aumenta permanentemente la eficiencia de todas las maquinas.
     - Se puede elegir esta opcion en diversos turnos,
-      y cada vez aumentara la producciponen un 5% de la produccion base.
+      y cada vez aumentara la produccion un 5% de la produccion base.
     - Debes implementar una variable correspondiente en el diccionario de estados.
     - Una vez aumentada la eficiencia, tu decide como hacerla efectiva:
       • En la funcion calcular_estado_final, puedes aumentar la produccion despues de haber producido
       • O puedes modificar la formula de produccion_producir para que las 20,000 unidades a producir aumenten
     - Esta mejora la hacen los ingneieros de la empresa, por lo que no genera desembolso de la caja.
     """
+    estado["Coeficiente de produccion"]+=0.05
+
     return estado
 
 def produccion_mantenimiento_maquinaria(estado):
@@ -128,6 +126,18 @@ def produccion_mantenimiento_maquinaria(estado):
         • Debes implementar un contador en el Estado que indique cuantos turnos quedan de proteccion.
     - Este mantenimiento lo realiza el personal de la empresa, por lo que no genera desembolso de la caja.
     """
+    estado["MantenimientoHecho"]=True
+    maquinas = estado["Maquinas (total/activas/dañadas)"].split("/")
+    maquinas_danadas = int(maquinas[2])
+    maquinas_activas = int(maquinas[1])
+
+    maquinas_activas+=maquinas_danadas
+    maquinas_danadas=0
+
+    estado["Maquinas (total/activas/dañadas)"] = maquinas[0]+"/"+str(maquinas_activas)+"/"+str(maquinas_danadas)
+
+    estado["TurnosMantenimiento"]=3  #agregare esta llave al diccionario
+
     return estado
 
 def produccion_comprar_nueva_maquina(estado):
@@ -139,6 +149,21 @@ def produccion_comprar_nueva_maquina(estado):
     - Si no hay dinero, debes pedir un préstamo al 12% de interes
         • Es decir, compras la maquina nueva y te haces una deuda de S/ 11,200
     """
+    maquinas = estado["Maquinas (total/activas/dañadas)"].split("/")
+    maquinas_totales = int(maquinas[0])
+    maquinas_activas = int(maquinas[1])
+    maquinas_totales += 1
+    maquinas_activas += 1
+
+    if estado["Caja disponible"]>= 10000:
+        estado["Caja disponible"]-=10000
+
+    else:
+        deuda= (10000-estado["Caja disponible"]) * (1+0.12)
+        estado["Deuda pendiente"]+=deuda
+        estado["Caja disponible"] = 0
+
+    estado["Maquinas (total/activas/dañadas)"]=str(maquinas_totales)+"/"+str(maquinas_activas)+"/"+maquinas[2]
     return estado
 
 def produccion_no_hacer_nada(estado):
@@ -158,6 +183,9 @@ def rh_contratar_personal_permanente(estado):
     - Si se vuelve a ejecutar esta accion, se aumentan 4,000 mas en salarios y 1 mas en numero de empleados.
     - Se puede seguir aumentnto el personal infinitas veces.
     """
+    if estado["TurnosHiringFreeze"] > 0:
+        return estado
+
     estado["Sueldos por pagar"] = estado["Sueldos por pagar"] + 4000
     estado['Cantidad de empleados'] = estado['Cantidad de empleados'] + 1
     return estado
@@ -169,6 +197,9 @@ def rh_contratar_personal_temporal(estado):
     - Si no hay suficiente dinero, se financia la diferencia con un préstamo al 12% (prorrateado).
     - Registra el número de empleados temporales y los turnos que quedan.
     """
+    if estado["TurnosHiringFreeze"] > 0:
+        return estado
+
     # vemos suficiente dinero en la caja para pagar a los empleados
     if estado['Caja disponible'] < 10000:
         # si es menor entonces hacemos un prestamo con el 12% de interes (ojo que pedimos prestado lo que nos falta para contratar)
@@ -435,6 +466,9 @@ def compras_comprar_insumos_nacionales(estado):
     - Si no hay dinero, debes pedir un préstamo al 12% de interes
         • Es decir, compras los insumos, y te haces una deuda de S/ 11,200
     """
+    if estado["Prohibir Compras Nacionales"]:
+        return estado
+
     return estado
 
 def compras_comprar_insumos_importados(estado):
@@ -445,6 +479,8 @@ def compras_comprar_insumos_importados(estado):
     - Si no hay dinero, debes pedir un préstamo al 12% de interes
         • Es decir, compras los insumos, y te haces una deuda de S/ 15,680
     """
+    if estado["Prohibir Importaciones"]:
+        return estado
     return estado
 
 def compras_comprar_insumos_importados_premium(estado):
