@@ -75,7 +75,7 @@ def aplicar_carta(numero, estado):
             numero = 1
             aplicar_carta(numero, estado)
             print('todo normal')
-            return estado
+        return estado
 
     # Carta 9: Huelga por ambiente laboral
     #   - La proxima ronda no se produce.
