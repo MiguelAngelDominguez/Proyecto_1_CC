@@ -189,15 +189,13 @@ def calcular_estado_final(estado):
         ventas = 0
     else:
         ventas = min(pedidos, inventario)
+        
     # Carta 3: prohibir produccion
     if estado["TurnosBloqueoVentasCarta3"]>0:
         estado["TurnosBloqueoVentasCarta3"] -= 1
     elif estado["TurnosBloqueoVentasCarta3"]==0 and estado["TurnosBloqueoVentas"]==0:
         estado["Prohibir ventas"] = False
 
-    # Carta 24: Bloqueo logístico
-    if estado["TurnosBloqueoVentas"] > 0:
-        ventas = 0
 
 
     # ============================
