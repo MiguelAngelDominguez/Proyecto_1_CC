@@ -49,8 +49,6 @@ def calcular_estado_inicial():
         # Banadera de creditos activos
         "CreditoConcedido":                  False,
 
-        # Carta 9 y Carta 22
-        "TurnosProhibirProduccion":          0,
 
         #"TurnosDemandaExtra":                0,
         #"TurnosBloqueoDemanda":              0,
@@ -61,37 +59,38 @@ def calcular_estado_inicial():
         # Carta 3
         'AlmacenDeLoProducidoAnteiormente':  0,
         'Carta 3':                         False,
+        "TurnosBloqueoVentasCarta3":         0,
         # Carta 4
         'Incendio':                        False,
         # Carta 6
         "TurnosDemandaReducida":             0,
+        # Carta 9 y Carta 22
+        "TurnosProhibirProduccion": 0,
         # Carta 12
         "TurnosBoicot":                      0,
         "ReductorBoicot":                    1.0,
+        # Carta 13:
+        "TurnoErrorEtiqueta":                0,
+        # carta 14:
+        "TurnosImportaciones":               0,
+        # carta 15:
+        "TurnosProhibicionComprasNacionales":0,
+        # carta 18:
+        "TurnosPlaga":                       0,
+        # carta 24:
+        "TurnosBloqueoVentas":               0,
+        # Carta 26:
+        "TurnoCompetidorAgresivo":           0,
+        # carta 28:
+        "TurnosCostos":                      0,
+        # Carta 30:
+        "TurnosHuelga":                      0,
+        # Carta 34:
+        "TurnoMalDiseñoEmpaque":             0,
         #carta 37:
         "TurnosAccidente":                   0,
-        #carta 18:
-        "TurnosPlaga":                       0,
         #carta 40:
         "TurnosHiringFreeze":                0,
-        #carta 14:
-        "TurnosImportaciones":               0,
-        #carta 24:
-        "TurnosBloqueoVentas":               0,
-        #carta 3:
-        "TurnosBloqueoVentasCarta3":         0,
-        #carta 28:
-        "TurnosCostos":                      0,
-        #carta 15:
-        "TurnosProhibicionComprasNacionales":  0,
-        # Carta 26:
-        "TurnoCompetidorAgresivo":             0,
-        # Carta 34:
-        "TurnoMalDiseñoEmpaque":               0,
-        # Carta 30:
-        "TurnosHuelga":                        0,
-        # Carta 13:
-        "TurnoErrorEtiqueta":                  0,
         #de acciones
         "Coeficiente de produccion":           0,
         "TurnosMantenimiento":                 0
