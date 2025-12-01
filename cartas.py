@@ -11,7 +11,7 @@ def aplicar_carta(numero, estado):
     elif numero == 2:
         maquinas_str = estado["Maquinas (total/activas/dañadas)"]
         partes = maquinas_str.split('/')
-        if int(partes[1]) > 1:
+        if int(partes[1]) > 1:  
             maquinas_activas = int(partes[1]) - 2
             maquinas_daniadas = int(partes[2]) + 2
             estado['Maquinas (total/activas/dañadas)'] = f'{int(partes[0])}/{maquinas_activas}/{maquinas_daniadas}'

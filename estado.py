@@ -153,7 +153,7 @@ def calcular_estado_final(estado):
          • ‘EmpleadosTemporales’
          • Duracion de ‘MejoraProceso’, ‘BrandingActivo’, ‘MantenimientoHecho’, etc.
        - Desactivar (poner a False o 0) cualquier flag cuyo contador llegue a cero
-
+    
     8) Perdida de inventario:
        - Los meses que no se produce nada, el 10% de insumos caduca.
        - Si la produccion de este mes uso menos inventario que el 10% disponible,
