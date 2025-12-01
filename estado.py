@@ -171,6 +171,10 @@ def calcular_estado_final(estado):
     inventario = estado["Inventario"]
     # 
     estado['Ventas'] = min(pedidos, inventario)
+
+    if estado["Prohibir ventas"]:
+        estado['Ventas'] = 0
+
     # Aplicar boicot, verifica contador
     if estado["TurnosBoicot"] > 0:
         estado['Ventas'] = int(estado['Ventas'] * estado["ReductorBoicot"])
@@ -190,9 +194,6 @@ def calcular_estado_final(estado):
     # Carta 24: Bloqueo logístico
     if estado["TurnosBloqueoVentas"] > 0:
         estado["TurnosBloqueoVentas"] -= 1
-
-    if estado["Prohibir ventas"]:
-        estado['Ventas'] = 0
 
     # Carta 3: prohibir produccion
     if estado["TurnosBloqueoVentasCarta3"]>0:
