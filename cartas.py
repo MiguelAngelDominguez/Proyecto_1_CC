@@ -26,7 +26,7 @@ def aplicar_carta(numero, estado):
     # Carta 3: Virus informatico:
     # Se pierde visibilidad del inventario y de los insumos por 1 turno
     # No puedes producir porque no sabes cuantos insumos hay.
-    # No puedes vender porque no sabes cuanto invnetario hay.
+    # No puedes vender porque no sabes cuanto inventario hay.
     # Los clientes se enteraron y bajo la reputacion 1 nivel
     # Duración: 2 turnos
     elif numero == 3:
@@ -41,7 +41,7 @@ def aplicar_carta(numero, estado):
     # Carta 4: Incendio en almacen
     #   - Se pierde el inventario total (al final del mes, despues de haber producido y vendido)
     elif numero == 4:
-        # zolo lo ponemoz en 0, porque primero zon laz accionez y luego la carta
+        # solo lo ponemos en 0, porque primero son laz acciones y luego la carta
         estado["Inventario"] = 0
         return estado
 
@@ -227,6 +227,11 @@ def aplicar_carta(numero, estado):
     #   - No se produce la siguiente ronda:
     # Duración: 2 turnos
     elif numero == 21:
+        estado["Prohibir Produccion"] = True
+        if estado["TurnosProhibirProduccion"] < 1:
+            estado["TurnosProhibirProduccion"] = 2
+        elif estado["TurnosProhibirProduccion"] == 1:
+            estado["TurnosProhibirProduccion"] += 1
         return estado
 
     # Carta 22: Licencia vencida

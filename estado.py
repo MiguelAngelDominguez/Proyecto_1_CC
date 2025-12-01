@@ -47,7 +47,7 @@ def calcular_estado_inicial():
         # Banadera de creditos activos
         "CreditoConcedido":                  False,
 
-        # Carta 9
+        # Carta 9 y Carta 22
         "TurnosProhibirProduccion":          0,
 
         #"TurnosDemandaExtra":                0,
@@ -268,11 +268,7 @@ def calcular_estado_final(estado):
             estado["TurnosBoicot"] = 0
 
 
-    # Carta 14: Prohibir importaciones
-    if estado["TurnosImportaciones"] > 0:
-        estado["TurnosImportaciones"] -= 1
-        if estado["TurnosImportaciones"] == 0:
-            estado["Prohibir Importaciones"] = False
+
 
     # Carta 15: Prohibir compras nacionales
     if estado["TurnosProhibicionComprasNacionales"] > 0:
@@ -323,5 +319,14 @@ def calcular_estado_final(estado):
     #==============================================================
     if estado["Reputacion del mercado"].split(' ')[1] < 0:
         estado["Reputacion del mercado"] = f'Nivel 0'
+
+
+    # TODO SOBRE LOS TURNOS PONGANLOS AL FINAL
+    # Carta 14: Prohibir importaciones
+    if estado["TurnosImportaciones"] > 0:
+        estado["TurnosImportaciones"] -= 1
+        if estado["TurnosImportaciones"] == 0:
+            estado["Prohibir Importaciones"] = False
+
 
     return estado
