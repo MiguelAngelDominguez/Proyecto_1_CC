@@ -31,8 +31,6 @@ def aplicar_carta(numero, estado):
     # Duración: 2 turnos
     elif numero == 3:
 
-
-
         partes = estado["Reputacion del mercado"].split(' ')
         num = int(partes[1]) - 1
         estado["Reputacion del mercado"] = f'Nivel {max(0, num)}'
@@ -292,6 +290,13 @@ def aplicar_carta(numero, estado):
     #   - Inventario acumulado (no se vende este mes).
     #   - Debemos pagar 10,000 por almacén
     elif numero == 31:
+        estado["Prohibir ventas"]=True
+        if estado["Caja disponible"]>=10000:
+            estado["Caja disponible"]-=10000
+        else:
+            deuda=(10000 - estado["Caja disponible"])
+            estado["Deuda pendiente"] += deuda
+            estado["Caja disponible"] = 0
         return estado
 
     # Carta 32: Error contable
@@ -367,6 +372,10 @@ def aplicar_carta(numero, estado):
     #   Todos los empleados se quedaron en su casa por un mes
     #   No se vende ni se produce
     elif numero == 39:
+        estado["Prohibir Produccion"]=True
+        estado["Cantidad de empleados"]=0
+        estado["Prohibir ventas"]=True
+
         return estado
 
     # Carta 40: Hiring Freeze

@@ -28,6 +28,7 @@ def calcular_estado_inicial():
         "Prohibir Compras":                  False,
         "Prohibir Importaciones":            False,
         "Fondo emergencia":                  False,
+        "Prohibir ventas":                   False,
 
         # Contadores y flags temporales
         "TurnosProduccionExtra":             0,
