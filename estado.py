@@ -182,9 +182,6 @@ def calcular_estado_final(estado):
         if estado["TurnosBoicot"] == 0:
             estado["ReductorBoicot"] = 1.0
 
-    # Asegurar que no se venda más inventario del disponible
-    estado['Ventas'] = min(estado['Ventas'], inventario)
-
     # Actualizar estado
     estado["Inventario"] -= estado['Ventas']
     estado["Unidades vendidas"] += estado['Ventas']
