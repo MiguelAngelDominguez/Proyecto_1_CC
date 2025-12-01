@@ -168,20 +168,20 @@ def calcular_estado_final(estado):
     pedidos = estado["Pedidos por atender"]
     inventario = estado["Inventario"]
     # 
-    ventas = min(pedidos, inventario)
+    estado['Ventas'] = min(pedidos, inventario)
     # Aplicar boicot, verifica contador
     if estado["TurnosBoicot"] > 0:
-        ventas = int(ventas * estado["ReductorBoicot"])
+        estado['Ventas'] = int(estado['Ventas'] * estado["ReductorBoicot"])
         # Si el boicot ya terminó restaurar reductor
         if estado["TurnosBoicot"] == 0:
             estado["ReductorBoicot"] = 1.0
     # Asegurar que no se venda más inventario del disponible
-    ventas = min(ventas, inventario)
+    estado['Ventas'] = min(estado['Ventas'], inventario)
     # Actualizar estado
-    estado["Inventario"] -= ventas
-    estado["Unidades vendidas"] += ventas
-    estado["Caja disponible"] += ventas * precio_venta
-    estado["Pedidos por atender"] -= ventas
+    estado["Inventario"] -= estado['Ventas']
+    estado["Unidades vendidas"] += estado['Ventas']
+    estado["Caja disponible"] += estado['Ventas'] * precio_venta
+    estado["Pedidos por atender"] -= estado['Ventas']
 
     # Carta 24: Bloqueo logístico
     if estado["TurnosBloqueoVentas"] > 0:
