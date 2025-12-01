@@ -329,6 +329,10 @@ def aplicar_carta(numero, estado):
     #   - Inventario acumulado (no se vende este mes).
     #   - Debemos pagar 10,000 por almacén
     elif numero == 31:
+        estado["Prohibir ventas"] = True
+        estado["Caja disponible"] -= 10000
+        if estado["Caja disponible"] < 0:
+            estado["Caja disponible"] = 0
         return estado
 
     # Carta 32: Error contable
@@ -420,7 +424,8 @@ def aplicar_carta(numero, estado):
     #   Todos los empleados se quedaron en su casa por un mes
     #   No se vende ni se produce
     elif numero == 39:
-
+        estado["Prohibir ventas"] = True
+        estado["Prohibir Produccion"] = True
         return estado
 
     # Carta 40: Hiring Freeze
