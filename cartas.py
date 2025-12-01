@@ -30,8 +30,16 @@ def aplicar_carta(numero, estado):
     # Los clientes se enteraron y bajo la reputacion 1 nivel
     # Duración: 2 turnos
     elif numero == 3:
+        estado["Prohibir Produccion"] = True
+        if estado["TurnosProhibirProduccion"] < 1:
+            estado["TurnosProhibirProduccion"] = 2
+        elif estado["TurnosProhibirProduccion"] == 1:
+            estado["TurnosProhibirProduccion"] += 1
 
-
+        if estado["TurnosBloqueoVentas"] < 1:
+            estado["TurnosBloqueoVentas"] = 2
+        elif estado["TurnosBloqueoVentas"] == 1:
+            estado["TurnosBloqueoVentas"] += 1
 
         partes = estado["Reputacion del mercado"].split(' ')
         num = int(partes[1]) - 1
@@ -41,8 +49,6 @@ def aplicar_carta(numero, estado):
     # Carta 4: Incendio en almacen
     #   - Se pierde el inventario total (al final del mes, despues de haber producido y vendido)
     elif numero == 4:
-        # solo lo ponemos en 0, porque primero son laz acciones y luego la carta
-        estado["Inventario"] = 0
         return estado
 
     # Carta 5: Auditoria desfavorable
