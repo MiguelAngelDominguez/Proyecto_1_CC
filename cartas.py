@@ -67,6 +67,7 @@ def aplicar_carta(numero, estado):
         # 2) Eliminar inventario equivalente a la demanda actual
         demanda = estado["Pedidos por atender"]
         estado["Inventario"] = max(0, estado["Inventario"] - demanda)
+        estado["Pedidos por atender"] = int(demanda * 0.5)
         # 3) Activar 2 turnos
         estado["TurnosDemandaReducida"] = 2
         estado["ReductorDemanda"] = 0.5
