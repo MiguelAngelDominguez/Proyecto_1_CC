@@ -73,7 +73,6 @@ def aplicar_carta(numero, estado):
         estado["Pedidos por atender"] = int(demanda * 0.5)
         # 3) Activar 2 turnos
         estado["TurnosDemandaReducida"] += 2
-        estado["ReductorDemanda"] = 0.5
         return estado
 
     # Carta 7: Robo de insumos
@@ -278,6 +277,7 @@ def aplicar_carta(numero, estado):
     # Carta 28: Crisis economica
     #   - Todos los costos +10% por los siguientes 5 turnos:
     elif numero == 28:
+        estado["MultiplicadorCostos"] = 1.10
         estado["TurnosCostos"] = 5
         return estado
 

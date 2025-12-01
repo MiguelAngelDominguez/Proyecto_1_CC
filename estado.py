@@ -56,7 +56,6 @@ def calcular_estado_inicial():
         "DemandaExtraProximoMes":            0,
         "MultiplicadorVentas":               0,
         # Carta 6
-        "ReductorDemanda":                   1.0,
         "TurnosDemandaReducida":             0,
         # Carta 12
         "TurnosBoicot":                      0,
@@ -167,8 +166,8 @@ def calcular_estado_final(estado):
     # ============================
     # 3) Pago de la nomina del mes actual
     # ============================
-    estado["Sueldos por pagar"]     = estado["Sueldos por pagar"]
-    estado["Caja disponible"]       = estado["Caja disponible"]
+    estado["Sueldos por pagar"] = estado["Sueldos por pagar"]
+    estado["Caja disponible"] = estado["Caja disponible"]
 
 
     # ============================
@@ -229,8 +228,8 @@ def calcular_estado_final(estado):
     ## Carta 6:
     if estado["TurnosDemandaReducida"] > 0:
         estado["TurnosDemandaReducida"] -= 1
-        if estado["TurnosDemandaReducida"] == 0:
-            estado["ReductorDemanda"] = 1.0
+        """if estado["TurnosDemandaReducida"] == 0:
+            estado["ReductorDemanda"] = 1.0"""
 
 
     ## Carta 9: Huelga por ambiente laboral
