@@ -212,8 +212,16 @@ def calcular_estado_final(estado):
     # ============================
     # 3) Pago de la nomina del mes actual
     # ============================
-    estado["Sueldos por pagar"]     = estado["Sueldos por pagar"]
-    estado["Caja disponible"]       = estado["Caja disponible"]
+    sueldos = estado["Sueldos por pagar"]
+
+    if estado["Caja disponible"] >= sueldos:
+        estado["Caja disponible"] -= sueldos
+    else:
+        deuda = sueldos - estado["Caja disponible"]
+        # 12% de interés total
+        estado["Deuda"] += deuda * 1.12
+        estado["Caja disponible"] = 0
+    estado["Sueldos por pagar"]=0
 
 
     # ============================
