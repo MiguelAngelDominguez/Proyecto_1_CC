@@ -27,12 +27,7 @@ def produccion_producir(estado):
     # Verificar prohibicion
     # Si la producción está prohibida, se cuenta el turno prohibido y la función termina.
     if estado["Prohibir Produccion"]:
-        #estado["TurnosProhibidos"] += 1
         return estado
-
-    # Si no hay prohibición, se resetea el contador.
-    else:
-        estado["TurnosProhibidos"] = 0
 
     # Extraemos el número de máquinas activas:
     maquinas_str = estado["Maquinas (total/activas/dañadas)"]
