@@ -316,6 +316,13 @@ def aplicar_carta(numero, estado):
     #   - Debemos pagar 10,000 por almacén
     # Duración: 3 turnos
     elif numero == 30:
+        estado["Prohibir ventas"] = True
+        estado["Prohibir Produccion"] = True
+        estado["Caja disponible"] -= 10000
+        if estado["Caja disponible"] < 0:
+            estado["Caja disponible"] = 0
+
+        estado["TurnosHuelga"] = 3
         return estado
 
     # Carta 31: Rechazo de exportacion
