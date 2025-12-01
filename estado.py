@@ -73,6 +73,10 @@ def calcular_estado_inicial():
         "TurnosBloqueoVentas":                0,
         #carta 15:
         "TurnosProhibicionComprasNacionales":  0,
+        # Carta 26:
+        "TurnoCompetidorAgresivo":             0,
+        # Carta 34:
+        "TurnoMalDiseñoEmpaque":               0,
         #de acciones
         "Coeficiente de produccion":           0,
         "TurnosMantenimiento": 0
