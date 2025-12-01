@@ -106,8 +106,9 @@ def aplicar_carta(numero, estado):
     #   - Los clientes se enteran de la huelga y baja la reputación 3 niveles
     # Duración: 2 turnos
     elif numero == 9:
-        # 1) Activar bloqueo de producción por 2 turnos
+        # 1) Activar prohibición de producción
         estado["Prohibir Produccion"] = True
+        # Aumentar turnos
         estado["TurnosProhibirProduccion"] += 2
         # 2) Bajar reputación 3 niveles
         nivel = int(estado["Reputacion del mercado"].split()[-1])
