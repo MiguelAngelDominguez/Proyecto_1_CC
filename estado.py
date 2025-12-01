@@ -87,9 +87,11 @@ def calcular_estado_inicial():
         "TurnoCompetidorAgresivo":             0,
         # Carta 34:
         "TurnoMalDiseñoEmpaque":               0,
+        # Carta 30:
+        "TurnosHuelga":                        0,
         #de acciones
-        "Coeficiente de produccion":         0,
-        "TurnosMantenimiento":               0
+        "Coeficiente de produccion":           0,
+        "TurnosMantenimiento":                 0
     }
 
 
