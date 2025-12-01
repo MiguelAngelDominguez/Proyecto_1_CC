@@ -61,6 +61,9 @@ def aplicar_carta(numero, estado):
     #   - Luego, la demanda actual se reduce en 50%
     # Duración: 2 turnos
     elif numero == 6:
+        # reponer mercaderia, significa que debido a el problema del producto, hubo que retirar
+        # la mercaderia y reponer
+        # tras el incidente, la demanda se contrae(menos pedidos) por un tiempo
         # 1) Bajar reputación 2 niveles
         nivel = int(estado["Reputacion del mercado"].split()[-1])
         estado["Reputacion del mercado"] = f"Nivel {max(0, nivel - 2)}"
@@ -69,7 +72,7 @@ def aplicar_carta(numero, estado):
         estado["Inventario"] = max(0, estado["Inventario"] - demanda)
         estado["Pedidos por atender"] = int(demanda * 0.5)
         # 3) Activar 2 turnos
-        estado["TurnosDemandaReducida"] = 2
+        estado["TurnosDemandaReducida"] += 2
         estado["ReductorDemanda"] = 0.5
         return estado
 
@@ -275,6 +278,7 @@ def aplicar_carta(numero, estado):
     # Carta 28: Crisis economica
     #   - Todos los costos +10% por los siguientes 5 turnos:
     elif numero == 28:
+        estado["TurnosCostos"] = 5
         return estado
 
     # Carta 29: Fuga de datos

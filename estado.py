@@ -229,6 +229,8 @@ def calcular_estado_final(estado):
     ## Carta 6:
     if estado["TurnosDemandaReducida"] > 0:
         estado["TurnosDemandaReducida"] -= 1
+        if estado["TurnosDemandaReducida"] == 0:
+            estado["ReductorDemanda"] = 1.0
 
 
     ## Carta 9: Huelga por ambiente laboral
