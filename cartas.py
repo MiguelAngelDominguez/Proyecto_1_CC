@@ -160,7 +160,6 @@ def aplicar_carta(numero, estado):
     #     • Además, gastas 15,000 soles en la logística inversa
     # Duración: 3 turnos
     elif numero == 13:
-
         return estado
 
     # Carta 14: Retraso en importacion
