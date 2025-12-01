@@ -57,6 +57,7 @@ def calcular_estado_inicial():
         "TurnosVentasExtra":                 0,
         "DemandaExtraProximoMes":            0,
         "Ventas":                            0,
+        "VentasAntMes":                      0,
         # Carta 3
         'AlmacenDeLoProducidoAnteiormente':  0,
         'Carta 3':                         False,
@@ -89,6 +90,8 @@ def calcular_estado_inicial():
         "TurnoMalDiseñoEmpaque":               0,
         # Carta 30:
         "TurnosHuelga":                        0,
+        # Carta 13:
+        "TurnoErrorEtiqueta":                  0,
         #de acciones
         "Coeficiente de produccion":           0,
         "TurnosMantenimiento":                 0
