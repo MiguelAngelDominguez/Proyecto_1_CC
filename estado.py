@@ -56,7 +56,7 @@ def calcular_estado_inicial():
         #"TurnosBloqueoDemanda":              0,
         "TurnosVentasExtra":                 0,
         "DemandaExtraProximoMes":            0,
-        "MultiplicadorVentas":               0,
+        "Ventas":                            0,
         # Carta 3
         'AlmacenDeLoProducidoAnteiormente':  0,
         'Carta 3':                         False,
@@ -172,7 +172,6 @@ def calcular_estado_final(estado):
     # Aplicar boicot, verifica contador
     if estado["TurnosBoicot"] > 0:
         ventas = int(ventas * estado["ReductorBoicot"])
-        estado["TurnosBoicot"] -= 1
         # Si el boicot ya terminó restaurar reductor
         if estado["TurnosBoicot"] == 0:
             estado["ReductorBoicot"] = 1.0
