@@ -235,7 +235,7 @@ def calcular_estado_final(estado):
     # TurnosProhibidos (huelga u otros bloqueos)
     if estado["TurnosProhibirProduccion"] > 0:
         estado["TurnosProhibirProduccion"] -= 1
-        # Si se acaban los turnos, liberar la prohibición
+        # Si se acaban los turnos, cambiar flag prohibición
         if estado["TurnosProhibirProduccion"] == 0:
             estado["Prohibir Produccion"] = False
 

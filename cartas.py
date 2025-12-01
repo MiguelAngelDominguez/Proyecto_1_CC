@@ -108,7 +108,7 @@ def aplicar_carta(numero, estado):
     elif numero == 9:
         # 1) Activar bloqueo de producción por 2 turnos
         estado["Prohibir Produccion"] = True
-        estado["TurnosProhibirProduccion"] = 2
+        estado["TurnosProhibirProduccion"] += 2
         # 2) Bajar reputación 3 niveles
         nivel = int(estado["Reputacion del mercado"].split()[-1])
         estado["Reputacion del mercado"] = f"Nivel {max(0, nivel - 3)}"
