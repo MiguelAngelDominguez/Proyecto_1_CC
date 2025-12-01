@@ -28,6 +28,7 @@ def calcular_estado_inicial():
         "Prohibir Compras":                  False,
         "Prohibir Importaciones":            False,
         "Fondo emergencia":                  False,
+        "Prohibir ventas":                   False,
 
         # Contadores y flags temporales
         "TurnosProduccionExtra":             0,
@@ -44,6 +45,7 @@ def calcular_estado_inicial():
 
         'Bloqueodeclima':                    False,
         'ContadordeBloqueodeclima':          0,
+        "TurnosBloqueoDemanda":              0,
         # Banadera de creditos activos
         "CreditoConcedido":                  False,
 
@@ -55,6 +57,11 @@ def calcular_estado_inicial():
         "TurnosVentasExtra":                 0,
         "DemandaExtraProximoMes":            0,
         "MultiplicadorVentas":               0,
+        # Carta 3
+        'AlmacenDeLoProducidoAnteiormente':  0,
+        'Carta 3':                         False,
+        # Carta 4
+        'Incendio':                        False,
         # Carta 6
         "TurnosDemandaReducida":             0,
         # Carta 12
@@ -70,6 +77,8 @@ def calcular_estado_inicial():
         "TurnosImportaciones":               0,
         #carta 24:
         "TurnosBloqueoVentas":               0,
+        #carta 3:
+        "TurnosBloqueoVentasCarta3":         0,
         #carta 28:
         "TurnosCostos":                      0,
         #carta 15:
@@ -158,8 +167,17 @@ def calcular_estado_final(estado):
     precio_venta = 4.5
     pedidos = estado["Pedidos por atender"]
     inventario = estado["Inventario"]
-    #
-    ventas = min(pedidos, inventario)
+
+    # Carta 3: prohibir produccion
+    if estado["TurnosBloqueoVentasCarta3"]>0:
+        estado["TurnosBloqueoVentasCarta3"] -= 1
+    elif estado["TurnosBloqueoVentasCarta3"]==0 and estado["TurnosBloqueoVentas"]==0:
+        estado["Prohibir ventas"] = False
+
+    # Carta 24: Bloqueo logístico
+    if estado["TurnosBloqueoVentas"] > 0:
+        ventas = 0
+
     # Aplicar boicot, verifica contador
     if estado["TurnosBoicot"] > 0:
         ventas = int(ventas * estado["ReductorBoicot"])
@@ -174,12 +192,6 @@ def calcular_estado_final(estado):
     estado["Unidades vendidas"] += ventas
     estado["Caja disponible"] += ventas * precio_venta
     estado["Pedidos por atender"] -= ventas
-    
-    # Carta 24: Bloqueo logístico
-    if estado["TurnosBloqueoVentas"] > 0:
-        ventas = 0
-    else:
-        ventas = min(pedidos, inventario)
 
 
     # ============================
@@ -272,7 +284,11 @@ def calcular_estado_final(estado):
         if estado["TurnosBoicot"] == 0:
             estado["TurnosBoicot"] = 0
 
-
+    # Carta 3
+    if estado['Carta 3']:
+        estado['Inventario'] = estado["Inventario"] - estado['AlmacenDeLoProducidoAnteiormente']
+        estado["Insumos disponibles"] += 40000
+        estado['Carta 3'] = False
 
 
     # Carta 15: Prohibir compras nacionales
@@ -322,11 +338,13 @@ def calcular_estado_final(estado):
     #==============================================================
     # Poner bien la reputacion del mercado, por si esta en negativo
     #==============================================================
-    if estado["Reputacion del mercado"].split(' ')[1] < 0:
+    if int(estado["Reputacion del mercado"].split(' ')[1]) < 0:
         estado["Reputacion del mercado"] = f'Nivel 0'
 
+    if estado['Incendio']:
+        estado["Inventario"] = 0
 
-    # TODO SOBRE LOS TURNOS PONGANLOS AL FINAL
+        # TODO SOBRE LOS TURNOS PONGANLOS AL FINAL
     # Carta 14: Prohibir importaciones
     if estado["TurnosImportaciones"] > 0:
         estado["TurnosImportaciones"] -= 1
