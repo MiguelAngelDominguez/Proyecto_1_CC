@@ -181,9 +181,6 @@ def calcular_estado_final(estado):
     # Aplicar boicot, verifica contador
     if estado["TurnosBoicot"] > 0:
         estado['Ventas'] = int(estado['Ventas'] * estado["ReductorBoicot"])
-        # Si el boicot ya terminó restaurar reductor
-        if estado["TurnosBoicot"] == 0:
-            estado["ReductorBoicot"] = 1.0
 
     # si no se atiende todos los pedidos la demanda baja un nivel
     if estado["Ventas"] < pedidos:
