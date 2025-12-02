@@ -363,6 +363,7 @@ def aplicar_carta(numero, estado):
     #   - No se venden productos este mes:
     #   - reputación baja 2 niveles
     elif numero == 33:
+        estado["Prohibir ventas"] = True
         if estado["TurnosBloqueoVentas"] <= 1:
             estado["TurnosBloqueoVentas"] += 1
         reputaciion_mercado = int(estado["Reputacion del mercado"].split()[-1])
