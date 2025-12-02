@@ -407,7 +407,7 @@ def aplicar_carta(numero, estado):
     #   - reputación baja 2 niveles
     elif numero == 36:
         if estado["Caja disponible"] < 15000:
-            deuda = (15000 - estado["Caja disponible"])
+            deuda = (15000 - estado["Caja disponible"])* 1.12
             estado["Deuda pendiente"] += deuda
             estado["Caja disponible"] = 0
         else:
