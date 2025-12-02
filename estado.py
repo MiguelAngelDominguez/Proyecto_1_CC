@@ -30,6 +30,8 @@ def calcular_estado_inicial():
         "Fondo emergencia":                  False,
         "Prohibir ventas":                   False,
         "PrecioVenta":                       precio_venta,
+        'proteccion':                        False,
+        "Turno proteccion reputacion":       0,
 
         # Contadores y flags temporales
         "TurnosProduccionExtra":             0,
@@ -47,6 +49,7 @@ def calcular_estado_inicial():
         'Bloqueodeclima':                    False,
         'ContadordeBloqueodeclima':          0,
         "TurnosBloqueoDemanda":              0,
+        'Carta 18':                         False,
         # Banadera de creditos activos
         "CreditoConcedido":                  False,
 
@@ -90,6 +93,8 @@ def calcular_estado_inicial():
         "TurnoMalDiseñoEmpaque":             0,
         #carta 37:
         "TurnosAccidente":                   0,
+        #carta 38
+        'Carta 38':                         False,
         #carta 40:
         "TurnosHiringFreeze":                0,
         #de acciones
@@ -172,7 +177,7 @@ def calcular_estado_final(estado):
     precio_venta = 4.5
     pedidos = estado["Pedidos por atender"]
     inventario = estado["Inventario"]
-    # 
+    #
     estado['Ventas'] = min(pedidos, inventario)
 
     if estado["Prohibir ventas"]:
@@ -335,9 +340,14 @@ def calcular_estado_final(estado):
             estado["Prohibir Compras Nacionales"] = False
 
     # Carta 18: Plaga
-    if estado["TurnosPlaga"] > 0:
-        estado["TurnosPlaga"] -= 1
 
+
+    if estado['Carta 18']:
+        estado['Inventario']+= estado['AlmacenDeLoProducidoAnteiormente']*0.5
+        if estado["TurnosPlaga"] > 0:
+            estado["TurnosPlaga"] -= 1
+        else:
+            estado["Carta 18"] = False
 
     # Carta 24: Bloqueo logístico
     if estado["TurnosBloqueoVentas"] > 0:
@@ -366,6 +376,11 @@ def calcular_estado_final(estado):
         estado["TurnosAccidente"] -= 1
         if estado["TurnosAccidente"] == 0:
             estado["Cantidad de empleados"] += 1
+
+    # Carta 38: Derrame
+    if estado['Carta 38']:
+        estado["Insumos disponibles"] = 0
+        estado['Carta 38'] = False
 
     # Carta 40: Hiring Freeze
     if estado["TurnosHiringFreeze"] > 0:

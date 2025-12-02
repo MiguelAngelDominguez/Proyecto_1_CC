@@ -58,9 +58,6 @@ def produccion_producir(estado):
     if estado["MejoraProceso"]:
         #Si en caso se ejecuta la accion mejorar proceso, por cada turno aplicaremos un 5% de eficiciencia:
         produccion = produccion * (1 + estado["Coeficiente de produccion"])
-    #carta 18:
-    if estado["TurnosPlaga"] > 0:
-        produccion = produccion * 0.5
     #carta 37:
     if estado["TurnosAccidente"] > 0:
         produccion *= 0.5
