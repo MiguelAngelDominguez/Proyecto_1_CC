@@ -435,10 +435,11 @@ def aplicar_carta(numero, estado):
     #   - No puedes producir durante este mes y el siguiente
     elif numero == 38:
         estado["Carta 38"] = True
-
         estado["Prohibir Produccion"] = True
-        if estado["TurnosProhibirProduccion"] <= 1:
+        if estado["TurnosProhibirProduccion"] == 1:
             estado["TurnosProhibirProduccion"] += 1
+        elif estado ["TurnosProhibirProduccion"] < 1:
+            estado["TurnosProhibirProduccion"] += 2
         return estado
 
     # Carta 39: Virus contagioso
