@@ -169,7 +169,7 @@ def aplicar_carta(numero, estado):
     #     • Además, gastas 15,000 soles en la logística inversa
     # Duración: 3 turnos
     elif numero == 13:
-        estado["Caja disponible"] -= estado["Ventas"] + estado["VentasAntMes"] + 15000
+        estado["Caja disponible"] -= (estado["Ventas"] - estado["VentasAntMes"])*estado["PrecioVenta"] + 15000
         if estado["Caja disponible"] < 0 :
             estado["Caja disponible"] = 0
         estado["TurnoErrorEtiqueta"] = 3
@@ -246,9 +246,7 @@ def aplicar_carta(numero, estado):
     #   - Multas +30,000.
     #   - Prohibir produccion la siguiente ronda.
     elif numero == 22:
-        estado["Caja disponible"] -= 30000
-        if estado["Caja disponible"] < 0:
-            estado["Caja disponible"] = 0
+        estado["Deuda pendiente"] += 30000
         if estado["TurnosProhibirProduccion"] <= 1:
             estado["TurnosProhibirProduccion"] += 1
         return estado
