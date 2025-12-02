@@ -29,6 +29,7 @@ def calcular_estado_inicial():
         "Prohibir Importaciones":            False,
         "Fondo emergencia":                  False,
         "Prohibir ventas":                   False,
+        "PrecioVenta":                       precio_venta,
 
         # Contadores y flags temporales
         "TurnosProduccionExtra":             0,
@@ -180,7 +181,16 @@ def calcular_estado_final(estado):
     # Aplicar boicot, verifica contador
     if estado["TurnosBoicot"] > 0:
         estado['Ventas'] = int(estado['Ventas'] * estado["ReductorBoicot"])
-        
+        # Si el boicot ya terminó restaurar reductor
+        if estado["TurnosBoicot"] == 0:
+            estado["ReductorBoicot"] = 1.0
+
+    # si no se atiende todos los pedidos la demanda baja un nivel
+    if estado["Ventas"] < pedidos:
+        nivel_actual = int(estado["Reputacion del mercado"].split()[1])
+        nuevo_nivel = max(0, nivel_actual - 1)
+        estado["Reputacion del mercado"] = f"Nivel {nuevo_nivel}"
+
     # Actualizar estado
     estado["Inventario"] -= estado['Ventas']
     estado["Unidades vendidas"] += estado['Ventas']
@@ -222,6 +232,9 @@ def calcular_estado_final(estado):
     if estado["DemandaExtraTemporal"] > 0:
         estado["DemandaExtraTemporal"] -= 1
 
+    if estado["TurnosDemandaReducida"] > 0:
+        nueva_demanda = nueva_demanda * 0.5
+
     # 7) Almacenar resultado final
     estado["Pedidos por atender"] = int(nueva_demanda)
 
@@ -236,7 +249,7 @@ def calcular_estado_final(estado):
     else:
         deuda = sueldos - estado["Caja disponible"]
         # 12% de interés total
-        estado["Deuda"] += deuda * 1.12
+        estado["Deuda pendiente"] += deuda * 1.12
         estado["Caja disponible"] = 0
 
 
@@ -245,13 +258,6 @@ def calcular_estado_final(estado):
     # ============================
 
     estado["Sueldos por pagar"] = estado["Cantidad de empleados"] * estado["Costo por empleado"]
-
-    # ============================
-    # 5) Anular multas, accidentes, y demas cartas del caos
-    # ============================
-
-    estado["Prohibir Produccion"]   = estado["Prohibir Produccion"]
-
 
     # ============================
     # 6) Produccion en automatico
@@ -269,7 +275,7 @@ def calcular_estado_final(estado):
         estado["Inventario"] = estado["Inventario"] * 1.2
 
         estado["Inventario"] = estado["Inventario"]
-        
+
     ## Carta 9: Huelga por ambiente laboral
     """if not estado["Prohibir Produccion"] and estado["TurnosProduccionExtra"] > 0:
         # Se produce lo mismo que en el mes anterior
@@ -280,6 +286,7 @@ def calcular_estado_final(estado):
         produccion_automatica = maquinas_activas * 2000
         # Actualizar inventario
         estado["Inventario"] += produccion_automatica"""
+
 
     # ============================
     # 7) Actualizacion de flags temporales y decremento de contadores
@@ -301,7 +308,7 @@ def calcular_estado_final(estado):
         estado["TurnosDemandaReducida"] -= 1
 
 
-    ## Carta 9: Huelga por ambiente laboral
+    ## Carta 9: Huelga por ambiente laboral y 21
     # TurnosProhibidos (huelga u otros bloqueos)
     if estado["TurnosProhibirProduccion"] > 0:
         estado["TurnosProhibirProduccion"] -= 1
@@ -313,7 +320,7 @@ def calcular_estado_final(estado):
     if estado["TurnosBoicot"] > 0:
         estado["TurnosBoicot"] -= 1
         if estado["TurnosBoicot"] == 0:
-            estado["ReductorBoicot"] = 1.0
+            estado["TurnosBoicot"] = 0
     
     # Cartas 13
     if estado["TurnoErrorEtiqueta"] > 0:
@@ -335,9 +342,6 @@ def calcular_estado_final(estado):
     if estado["TurnosPlaga"] > 0:
         estado["TurnosPlaga"] -= 1
 
-    # Carta 21
-    if estado["TurnosProhibirProduccion"] > 0:
-        estado["TurnosProhibirProduccion"] -= 1
 
     # Carta 24: Bloqueo logístico
     if estado["TurnosBloqueoVentas"] > 0:
@@ -371,6 +375,8 @@ def calcular_estado_final(estado):
     if estado["TurnosHiringFreeze"] > 0:
         estado["TurnosHiringFreeze"] -= 1
 
+
+
     # ============================
     # 8) Perdida de inventario:
     # ============================
@@ -393,6 +399,7 @@ def calcular_estado_final(estado):
 
     if estado['Incendio']:
         estado["Inventario"] = 0
+        estado["Incendio"] = False
 
         # TODO SOBRE LOS TURNOS PONGANLOS AL FINAL
     # Carta 14: Prohibir importaciones
