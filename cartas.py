@@ -160,7 +160,8 @@ def aplicar_carta(numero, estado):
     # Duración: 2 turnos
     elif numero == 12:
         estado["ReductorBoicot"] = 0.5
-        estado["TurnosBoicot"] = 2
+        if estado["TurnosBoicot"] <= 1:
+            estado["TurnosBoicot"] = 2
         return estado
 
     # Carta 13: Error de etiquetado
