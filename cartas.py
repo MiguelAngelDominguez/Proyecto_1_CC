@@ -295,7 +295,7 @@ def aplicar_carta(numero, estado):
     # Duración: 3 turnos
     elif numero == 26:
         estado["Caja disponible"] -= 5000
-        estado["Ventas"] = 0.6 * estado["Ventas"]
+
         estado["TurnoCompetidorAgresivo"] = 3
         return estado
 

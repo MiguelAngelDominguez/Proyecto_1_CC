@@ -355,6 +355,7 @@ def calcular_estado_final(estado):
 
     # Carta 26
     if estado["TurnoCompetidorAgresivo"] > 0:
+        estado["Ventas"] = 0.6 * estado["Ventas"]
         estado["TurnoCompetidorAgresivo"] -= 1
 
     # Carta 28: Crisis economica
