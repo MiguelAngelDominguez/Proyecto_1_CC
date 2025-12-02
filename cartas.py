@@ -9,6 +9,9 @@ def aplicar_carta(numero, estado):
     # Carta 2: Falla critica en maquinaria:
     # Pierdes 2 maquinas activas permanentemente (hasta hacer mantenimiento)
     elif numero == 2:
+        if estado["MantenimientoHecho"] and estado["TurnosMantenimiento"] > 0:
+            return estado
+
         maquinas_str = estado["Maquinas (total/activas/dañadas)"]
         partes = maquinas_str.split('/')
         if int(partes[1]) > 1:  
@@ -60,7 +63,7 @@ def aplicar_carta(numero, estado):
     elif numero == 5:
         estado["Multas e indemnizaciones"] += 5000
         partes = estado["Reputacion del mercado"].split(' ')
-        num = int(partes[1]) - 1
+        num = max(0,int(partes[1]) - 1)
         estado["Reputacion del mercado"] = f'Nivel {num}'
         return estado
 
@@ -78,7 +81,8 @@ def aplicar_carta(numero, estado):
         estado["Inventario"] = max(0, estado["Inventario"] - demanda)
         # 3) Activar 2 turnos
         estado["TurnosDemandaReducida"] = 2
-        estado["ReductorDemanda"] = 0.5
+        # 4) Reducir demanda actual al 50%
+        estado["Pedidos por atender"] = int(estado["Pedidos por atender"] * 0.5)
         return estado
 
     # Carta 7: Robo de insumos
@@ -91,30 +95,35 @@ def aplicar_carta(numero, estado):
             estado["Insumos disponibles"] = 0
         return estado
 
-    # Carta 8: Fuga de talento clave
+    # oCarta 8: Fuga de talento clave
     #   - Tras la fuga de talento, operarios sin experiencia manipularon y dañaron una maquina
     #   - Pierdes 1 maquina activa (pasa a dañada).
     #   - Pierdes 1 empleado.
     elif numero == 8:
-        if estado['ContadordeBloqueodeclima'] == 0:
-            maquinas_str = estado["Maquinas (total/activas/dañadas)"]
-            partes = maquinas_str.split('/')
-            maquinas_activas = int(partes[1]) - 1
-            maquinas_daniadas = int(partes[2]) + 1
-            estado['Maquinas (total/activas/dañadas)'] = f'{int(partes[0])}/{maquinas_activas}/{maquinas_daniadas}'
-            estado['Cantidad de empleados'] = estado['Cantidad de empleados'] - 1
-            estado['Bloqueodeclima'] = False
-            return estado
-        elif estado['Bloqueodeclima']:
-            numero = 1
-            aplicar_carta(numero, estado)
+        partes = estado["Maquinas (total/activas/dañadas)"].split("/")
+        total = int(partes[0])
+        activas = int(partes[1])
+        daniadas = int(partes[2])
+
+        # Dañar 1 máquina activa
+        if activas > 0:
+            activas -= 1
+            daniadas += 1
+        estado["Maquinas (total/activas/dañadas)"] = f"{total}/{activas}/{daniadas}"
+
+        # Perdemos un empleado
+        estado["Cantidad de empleados"] = max(0, estado["Cantidad de empleados"] - 1)
         return estado
+
 
     # Carta 9: Huelga por ambiente laboral
     #   - La proxima ronda no se produce.
     #   - Los clientes se enteran de la huelga y baja la reputación 3 niveles
     # Duración: 2 turnos
     elif numero == 9:
+        if estado["MantenimientoHecho"] and estado["TurnosMantenimiento"] > 0:
+            return estado
+
         # 1) Activar bloqueo de producción por 2 turnos
         estado["Prohibir Produccion"] = True
         estado["TurnosProhibirProduccion"] = 2
@@ -128,9 +137,10 @@ def aplicar_carta(numero, estado):
     #   - Reputacion baja 2 niveles
     #   - Te aplican una multa de 5,000 soles por malas practicas de seguridad de la informacion
     elif numero == 10:
+        if estado["MantenimientoHecho"] and estado["TurnosMantenimiento"] > 0:
+            return estado
         perdida = 5000
         interes = 0.12
-
         if estado["Caja disponible"] < perdida:
             deuda = (perdida - estado["Caja disponible"])*(1 + interes)
             estado["Deuda pendiente"] += deuda
@@ -286,8 +296,6 @@ def aplicar_carta(numero, estado):
     #   - Caja se reduce en 10,000.
     elif numero == 27:
         if estado["Caja disponible"] < 10000:
-            deuda = (10000 - estado["Caja disponible"])
-            estado["Deuda pendiente"] += deuda
             estado["Caja disponible"] = 0
         else:
             estado["Caja disponible"] -= 10000
@@ -341,8 +349,6 @@ def aplicar_carta(numero, estado):
     #   - Caja −7000.
     elif numero == 32:
         if estado["Caja disponible"] < 7000:
-            deuda = (7000 - estado["Caja disponible"])
-            estado["Deuda pendiente"] += deuda
             estado["Caja disponible"] = 0
         else:
             estado["Caja disponible"] -= 7000
