@@ -180,10 +180,7 @@ def calcular_estado_final(estado):
     # Aplicar boicot, verifica contador
     if estado["TurnosBoicot"] > 0:
         estado['Ventas'] = int(estado['Ventas'] * estado["ReductorBoicot"])
-        # Si el boicot ya terminó restaurar reductor
-        if estado["TurnosBoicot"] == 0:
-            estado["ReductorBoicot"] = 1.0
-
+        
     # Actualizar estado
     estado["Inventario"] -= estado['Ventas']
     estado["Unidades vendidas"] += estado['Ventas']
@@ -272,7 +269,17 @@ def calcular_estado_final(estado):
         estado["Inventario"] = estado["Inventario"] * 1.2
 
         estado["Inventario"] = estado["Inventario"]
-
+        
+    ## Carta 9: Huelga por ambiente laboral
+    """if not estado["Prohibir Produccion"] and estado["TurnosProduccionExtra"] > 0:
+        # Se produce lo mismo que en el mes anterior
+        maquinas_str = estado["Maquinas (total/activas/dañadas)"]
+        partes = maquinas_str.split('/')
+        maquinas_activas = int(partes[1])
+        # 2000 unidades por máquina (sin gastar insumos)
+        produccion_automatica = maquinas_activas * 2000
+        # Actualizar inventario
+        estado["Inventario"] += produccion_automatica"""
 
     # ============================
     # 7) Actualizacion de flags temporales y decremento de contadores
@@ -306,7 +313,7 @@ def calcular_estado_final(estado):
     if estado["TurnosBoicot"] > 0:
         estado["TurnosBoicot"] -= 1
         if estado["TurnosBoicot"] == 0:
-            estado["TurnosBoicot"] = 0
+            estado["ReductorBoicot"] = 1.0
     
     # Cartas 13
     if estado["TurnoErrorEtiqueta"] > 0:
