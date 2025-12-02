@@ -319,8 +319,7 @@ def calcular_estado_final(estado):
     ## Carta 12:
     if estado["TurnosBoicot"] > 0:
         estado["TurnosBoicot"] -= 1
-        if estado["TurnosBoicot"] == 0:
-            estado["TurnosBoicot"] = 0
+
     
     # Cartas 13
     if estado["TurnoErrorEtiqueta"] > 0:
