@@ -203,11 +203,41 @@ def calcular_estado_final(estado):
     # ============================
     # 2) Actualizacion de pedidos por atender
     # ============================
-    estado["Pedidos por atender"]   = estado["Pedidos por atender"]
-    estado["Reputacion del mercado"] = estado["Reputacion del mercado"]
-    # Obtener nivel de reputación
 
-    
+    # 1) Obtener nivel de reputación
+    nivel_rep = int(estado["Reputacion del mercado"].split()[-1])
+
+    # Demanda base = reputación × 1000
+    nueva_demanda = nivel_rep * 1000
+
+    # 2) Branding activo → +10%
+    if estado["BrandingActivo"]:
+        nueva_demanda *= 1.10
+
+    # 3) E-commerce activo → +5000 fijos
+    if estado["EcommerceActivo"]:
+        nueva_demanda += 5000
+
+    # 4) Campaña promocional → +4000 mientras dure
+    if estado["TurnosVentasExtra"] > 0:
+        nueva_demanda += 4000
+
+    # 5) Cobranding con influencer:
+    #    2 = primer mes → +300,000
+    #    1 = segundo mes → +150,000
+    if estado["DemandaExtraTemporal"] == 2:
+        nueva_demanda += 300000
+    elif estado["DemandaExtraTemporal"] == 1:
+        nueva_demanda += 150000
+
+    # 6) Reducir contador de demanda temporal
+    if estado["DemandaExtraTemporal"] > 0:
+        estado["DemandaExtraTemporal"] -= 1
+
+    # 7) Almacenar resultado final
+    estado["Pedidos por atender"] = int(nueva_demanda)
+
+
     # ============================
     # 3) Pago de la nomina del mes actual
     # ============================
