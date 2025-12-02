@@ -190,15 +190,6 @@ def calcular_estado_final(estado):
     estado["Caja disponible"] += estado['Ventas'] * precio_venta
     estado["Pedidos por atender"] -= estado['Ventas']
 
-    # Carta 24: Bloqueo logístico
-    if estado["TurnosBloqueoVentas"] > 0:
-        estado["TurnosBloqueoVentas"] -= 1
-
-    # Carta 3: prohibir produccion
-    if estado["TurnosBloqueoVentasCarta3"]>0:
-        estado["TurnosBloqueoVentasCarta3"] -= 1
-
-
 
     # ============================
     # 2) Actualizacion de pedidos por atender
@@ -249,7 +240,7 @@ def calcular_estado_final(estado):
         # El contador disminuye cada turno
         estado['ContadordeIncentivosActivos'] = estado['ContadordeIncentivosActivos'] - 1
         estado["Inventario"] = estado["Inventario"] * 1.2
-    else: # Falta modificar para quien lo use
+
         estado["Inventario"] = estado["Inventario"]
 
     ## Carta 9: Huelga por ambiente laboral
@@ -271,8 +262,6 @@ def calcular_estado_final(estado):
     # Ventas extra por campaña
     if estado["TurnosVentasExtra"] > 0:
         estado["TurnosVentasExtra"] -= 1
-        if estado["TurnosVentasExtra"] == 0:
-            estado["MultiplicadorVentas"] = 1.0
     # Bloqueo de campañas - cartas
     if estado["TurnosBloqueoDemanda"] > 0:
         estado["TurnosBloqueoDemanda"] -= 1
@@ -329,7 +318,7 @@ def calcular_estado_final(estado):
     # Carta 24: Bloqueo logístico
     if estado["TurnosBloqueoVentas"] > 0:
         estado["TurnosBloqueoVentas"] -= 1
-    
+
     # Carta 26
     if estado["TurnoCompetidorAgresivo"] > 0:
         estado["TurnoCompetidorAgresivo"] -= 1
