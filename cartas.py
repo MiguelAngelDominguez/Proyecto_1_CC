@@ -328,8 +328,10 @@ def aplicar_carta(numero, estado):
     elif numero == 30:
         estado["Prohibir ventas"] = True
         estado["Prohibir Produccion"] = True
-        estado["Caja disponible"] -= 10000
-        if estado["Caja disponible"] < 0:
+        if estado["Caja disponible"] >= 10000:
+            estado["Caja disponible"] -= 10000
+        else:
+            estado['Deuda pendiente'] += (10000 - estado['Caja disponible']) * 1.12
             estado["Caja disponible"] = 0
 
         estado["TurnosHuelga"] = 3
@@ -340,18 +342,21 @@ def aplicar_carta(numero, estado):
     #   - Debemos pagar 10,000 por almacén
     elif numero == 31:
         estado["Prohibir ventas"] = True
-        estado["Caja disponible"] -= 10000
-        if estado["Caja disponible"] < 0:
+        if estado["Caja disponible"] >= 10000:
+            estado["Caja disponible"] -= 10000
+        else:
+            estado['Deuda pendiente'] += (10000 - estado['Caja disponible']) * 1.12
             estado["Caja disponible"] = 0
         return estado
 
     # Carta 32: Error contable
     #   - Caja −7000.
     elif numero == 32:
-        if estado["Caja disponible"] < 7000:
-            estado["Caja disponible"] = 0
-        else:
+        if estado["Caja disponible"] >= 7000:
             estado["Caja disponible"] -= 7000
+        else:
+            estado['Deuda pendiente'] += (7000 - estado['Caja disponible']) * 1.12
+            estado["Caja disponible"] = 0
         return estado
 
     # Carta 33: Error en codigo de barras
@@ -383,7 +388,7 @@ def aplicar_carta(numero, estado):
     #   - Multas +30,000.
     elif numero == 35:
         nivel = int(estado["Reputacion del mercado"].split()[-1])
-        estado["Reputacion del mercado"] = f"Nivel {max(0, nivel - 2)}"
+        estado["Reputacion del mercado"] = f"Nivel {max(0, nivel - 3)}"
 
         estado["Multas e indemnizaciones"] += 30000
         return estado
@@ -424,7 +429,7 @@ def aplicar_carta(numero, estado):
         estado["Inventario"] = 0
         estado["Insumos disponibles"] = 0
         estado["Prohibir Produccion"] = True
-        if estado <= 1:
+        if estado["TurnosProhibirProduccion"] <= 1:
             estado["TurnosProhibirProduccion"] += 1
         return estado
 

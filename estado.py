@@ -308,7 +308,7 @@ def calcular_estado_final(estado):
         estado["TurnosDemandaReducida"] -= 1
 
 
-    ## Carta 9: Huelga por ambiente laboral
+    ## Carta 9: Huelga por ambiente laboral y 21
     # TurnosProhibidos (huelga u otros bloqueos)
     if estado["TurnosProhibirProduccion"] > 0:
         estado["TurnosProhibirProduccion"] -= 1
@@ -342,11 +342,6 @@ def calcular_estado_final(estado):
     if estado["TurnosPlaga"] > 0:
         estado["TurnosPlaga"] -= 1
 
-    # Carta 21
-    if estado["TurnosProhibirProduccion"] > 0:
-        estado["TurnosProhibirProduccion"] -= 1
-        if estado["TurnosProhibirProduccion"] == 0:
-            estado["Prohibir Produccion"] = False
 
     # Carta 24: Bloqueo logístico
     if estado["TurnosBloqueoVentas"] > 0:
