@@ -362,6 +362,7 @@ def aplicar_carta(numero, estado):
     #   - Debemos pagar 5,000 por almacén
     # Duración: 3 turnos
     elif numero == 26:
+
         if estado["Caja disponible"] < 5000:
             deuda = 5000 - estado["Caja disponible"]
             # 12% de interés total
@@ -387,7 +388,7 @@ def aplicar_carta(numero, estado):
     # Carta 28: Crisis economica
     #   - Todos los costos +10% por los siguientes 5 turnos:
     elif numero == 28:
-        estado["Sueldos por pagar"] = estado["Cantidad de empleados"] * estado["Costo por empleado"] * 1.10
+        estado["Sueldos por pagar"] = estado["Cantidad de empleados"] * estado["Costo por empleado"] 
         estado["TurnosCostos"] = 5
         return estado
 
@@ -559,9 +560,10 @@ def aplicar_carta(numero, estado):
         estado["Carta 3-39"] = True
         
         estado["Prohibir ventas"] = True
-        if estado["TurnosBloqueoVentas"] <= 1:
+        if estado["TurnosBloqueoVentas"] == 1:
             estado["TurnosBloqueoVentas"] += 1
-
+        elif estado["TurnosBloqueoVentas"] == 0:
+            estado["TurnosBloqueoVentas"] += 2
 
         return estado
 
