@@ -108,6 +108,7 @@ def produccion_mejorar_proceso(estado):
 
     return estado
 
+#----------------------hecho----------------------
 def produccion_mantenimiento_maquinaria(estado):
     """
     4. Mantenimiento de maquinaria:
@@ -127,7 +128,6 @@ def produccion_mantenimiento_maquinaria(estado):
         • Debes implementar un contador en el Estado que indique cuantos turnos quedan de proteccion.
     - Este mantenimiento lo realiza el personal de la empresa, por lo que no genera desembolso de la caja.
     """
-    estado["MantenimientoHecho"]=True
     maquinas = estado["Maquinas (total/activas/dañadas)"].split("/")
     maquinas_danadas = int(maquinas[2])
     maquinas_activas = int(maquinas[1])
@@ -137,7 +137,8 @@ def produccion_mantenimiento_maquinaria(estado):
 
     estado["Maquinas (total/activas/dañadas)"] = maquinas[0]+"/"+str(maquinas_activas)+"/"+str(maquinas_danadas)
 
-    estado["TurnosMantenimiento"]=3  #agregare esta llave al diccionario
+    estado["MantenimientoHecho"] = True
+    estado["TurnosMantenimiento"] = 3  #agregare esta llave al diccionario
 
     return estado
 

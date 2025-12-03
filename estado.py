@@ -30,7 +30,6 @@ def calcular_estado_inicial():
         "Fondo emergencia":                  False,
         "Prohibir ventas":                   False,
         "PrecioVenta":                       precio_venta,
-        'proteccion':                        False,
         "Turno proteccion reputacion":       0,
 
         # Contadores y flags temporales
@@ -49,7 +48,7 @@ def calcular_estado_inicial():
         'Bloqueodeclima':                    False,
         'ContadordeBloqueodeclima':          0,
         "TurnosBloqueoDemanda":              0,
-        'Carta 18':                         False,
+        'Carta 18':                          False,
         # Banadera de creditos activos
         "CreditoConcedido":                  False,
 
@@ -87,6 +86,8 @@ def calcular_estado_inicial():
         "TurnoCompetidorAgresivo":           0,
         # carta 28:
         "TurnosCostos":                      0,
+        # carta 29:
+        'Carta 29':                         False,
         # Carta 30:
         "TurnosHuelga":                      0,
         # Carta 34:
@@ -182,6 +183,10 @@ def calcular_estado_final(estado):
 
     if estado["Prohibir ventas"]:
         estado['Ventas'] = 0
+
+    if estado['Carta 29']:
+        estado['Ventas'] = estado['Ventas'] * 0.25
+        estado['Carta 29'] = False
 
     # Aplicar boicot, verifica contador
     if estado["TurnosBoicot"] > 0:
@@ -294,6 +299,13 @@ def calcular_estado_final(estado):
     # 7) Actualizacion de flags temporales y decremento de contadores
     # ============================
     estado["TurnosProduccionExtra"] = estado["TurnosProduccionExtra"]
+
+    #--------------hecho--------------
+    if estado["TurnosMantenimiento"] > 0:
+        estado["TurnosMantenimiento"] -= 1
+    else:
+        estado["MantenimientoHecho"] = False
+
     # Ventas extra por campaña
     if estado["TurnosVentasExtra"] > 0:
         estado["TurnosVentasExtra"] -= 1
@@ -365,6 +377,11 @@ def calcular_estado_final(estado):
             estado["Sueldos por pagar"] = estado["Cantidad de empleados"] * estado["Costo por empleado"]
 
     # Cartas 30
+    if estado['Carta 30']:
+        estado['Inventario'] = estado["Inventario"] - estado['AlmacenDeLoProducidoAnteiormente']
+        estado["Insumos disponibles"] += 40000
+        estado["Carta 30"] = False
+
     if estado["TurnosHuelga"] > 0:
         estado["TurnosHuelga"] -= 1
 
@@ -385,6 +402,8 @@ def calcular_estado_final(estado):
 
     # Carta 40: Hiring Freeze
     if estado["TurnosHiringFreeze"] > 0:
+
+
         estado["TurnosHiringFreeze"] -= 1
 
 
