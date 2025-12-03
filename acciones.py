@@ -273,6 +273,7 @@ def rh_capacitar_seguridad(estado):
     - También impide por 3 turnos cualquier robo interno, debido al aumento en seguridad.
     - También impide por 3 turnos que los empleados descarguen virus informático por error.
     """
+    estado["Proteccion Seguridad"] = 3
     return estado
 
 def rh_subir_sueldos(estado):

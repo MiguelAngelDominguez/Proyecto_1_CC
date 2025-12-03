@@ -60,6 +60,7 @@ def calcular_estado_inicial():
         "Ventas":                            0,
         "VentasAntMes":                      0,
         # Carta 3
+        'ProteccionSeguridad':               0,
         'AlmacenDeLoProducidoAnteiormente':  0,
         'Carta 3':                         False,
         "TurnosBloqueoVentasCarta3":         0,
@@ -316,6 +317,8 @@ def calcular_estado_final(estado):
     #  Carta 3:
     if estado["TurnosBloqueoVentasCarta3"] > 0 :
         estado["TurnosBloqueoVentasCarta3"] -= 1
+    if estado['ProteccionSeguridad'] > 0:
+        estado['ProteccionSeguridad'] -= 1
 
     ## Carta 6:
     if estado["TurnosDemandaReducida"] > 0:
