@@ -557,13 +557,11 @@ def aplicar_carta(numero, estado):
     #   No se vende ni se produce
     elif numero == 39:
         estado["Carta 3-39"] = True
+        
         estado["Prohibir ventas"] = True
         if estado["TurnosBloqueoVentas"] <= 1:
             estado["TurnosBloqueoVentas"] += 1
 
-        estado["Prohibir Produccion"] = True
-        if estado["TurnosProhibirProduccion"] <= 1:
-            estado["TurnosProhibirProduccion"] += 1
 
         return estado
 

@@ -343,10 +343,10 @@ def calcular_estado_final(estado):
         estado["TurnoErrorEtiqueta"] -= 1
 
     # Carta 3
-    if estado['"Carta 3-39"']:
+    if estado['Carta 3-39']:
         estado['Inventario'] = estado["Inventario"] - estado['AlmacenDeLoProducidoAnteiormente']
         estado["Insumos disponibles"] += 40000
-        estado['"Carta 3-39"'] = False
+        estado['Carta 3-39'] = False
 
     # Carta 15: Prohibir compras nacionales
     if estado["TurnosProhibicionComprasNacionales"] > 0:
