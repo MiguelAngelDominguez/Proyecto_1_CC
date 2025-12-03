@@ -571,7 +571,7 @@ def aplicar_carta(numero, estado):
     #   No puedes contratar empleados nuevos
     # Duración: 5 turnos
     elif numero == 40:
-        estado["TurnosHiringFreeze"] = 5
+        estado["TurnosHiringFreeze"] = 6
         return estado
 
     # Si el numero no coincide con ninguna carta:
