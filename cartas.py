@@ -556,6 +556,7 @@ def aplicar_carta(numero, estado):
     #   Todos los empleados se quedaron en su casa por un mes
     #   No se vende ni se produce
     elif numero == 39:
+        estado["Carta 3-39"] = True
         estado["Prohibir ventas"] = True
         if estado["TurnosBloqueoVentas"] <= 1:
             estado["TurnosBloqueoVentas"] += 1

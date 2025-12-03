@@ -62,10 +62,10 @@ def calcular_estado_inicial():
         # Carta 3
         'ProteccionSeguridad':               0,
         'AlmacenDeLoProducidoAnteiormente':  0,
-        'Carta 3':                         False,
+        'Carta 3-39':                        False,
         "TurnosBloqueoVentasCarta3":         0,
         # Carta 4
-        'Incendio':                        False,
+        'Incendio':                          False,
         # Carta 6
         "TurnosDemandaReducida":             0,
         # Carta 9 y Carta 22
@@ -343,10 +343,10 @@ def calcular_estado_final(estado):
         estado["TurnoErrorEtiqueta"] -= 1
 
     # Carta 3
-    if estado['Carta 3']:
+    if estado['"Carta 3-39"']:
         estado['Inventario'] = estado["Inventario"] - estado['AlmacenDeLoProducidoAnteiormente']
         estado["Insumos disponibles"] += 40000
-        estado['Carta 3'] = False
+        estado['"Carta 3-39"'] = False
 
     # Carta 15: Prohibir compras nacionales
     if estado["TurnosProhibicionComprasNacionales"] > 0:
