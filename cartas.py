@@ -309,6 +309,8 @@ def aplicar_carta(numero, estado):
     #   - No se produce la siguiente ronda:
     # Duración: 2 turnos
     elif numero == 21:
+        if estado["Fondo emergencia"]:
+            return estado
         estado["Prohibir Produccion"] = True
         if estado["TurnosProhibirProduccion"] < 1:
             estado["TurnosProhibirProduccion"] = 2
